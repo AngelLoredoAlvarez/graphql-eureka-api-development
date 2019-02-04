@@ -1,0 +1,52 @@
+CREATE OR REPLACE FUNCTION eureka_public.employee_full_address(
+    employee_table eureka_public.employee
+) RETURNS TEXT AS $$
+    DECLARE
+        town TEXT;
+        type_township TEXT;
+        township TEXT;
+        street TEXT;
+        exterior_number TEXT;
+        interior_number TEXT;
+        full_address TEXT;
+    BEGIN
+        SELECT
+            eureka_public.town.town,
+            eureka_public.township.type_township,
+            eureka_public.township.township,
+            eureka_public.street.street,
+            eureka_public.employee.exterior_number,
+            eureka_public.employee.interior_number
+        INTO
+            town,
+            type_township,
+            township,
+            street,
+            exterior_number,
+            interior_number
+        FROM
+            eureka_public.town
+        INNER JOIN
+            eureka_public.employee
+        ON
+            eureka_public.town.id = eureka_public.employee.id_town
+        INNER JOIN
+            eureka_public.township
+        ON
+            eureka_public.township.id = eureka_public.employee.id_township
+        INNER JOIN
+            eureka_public.street
+        ON
+            eureka_public.street.id = eureka_public.employee.id_street
+        WHERE
+            eureka_public.employee.id = employee_table.id;
+
+        IF (SELECT employee_table.interior_number <> '') THEN
+            full_address := street || ' #' || exterior_number || ', Int. ' || interior_number || ', ' || type_township || ' ' || township || ', ' || town;
+        ELSE
+            full_address := street || ' #' || exterior_number || ', ' || type_township || ' ' || township || ', ' || town;
+        END IF;
+
+        RETURN full_address;
+    END;
+$$ LANGUAGE PLPGSQL IMMUTABLE;

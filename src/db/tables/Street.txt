@@ -1,0 +1,11 @@
+CREATE TABLE eureka_public.street(
+    id UUID PRIMARY KEY DEFAULT UUID_GENERATE_V1MC(),
+    street TEXT NOT NULL,
+    id_township UUID NOT NULL REFERENCES eureka_public.township(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+Index
+CREATE INDEX street_id_township_idx ON eureka_public.street(id_township);
+
+Omit the query streetById
+COMMENT ON CONSTRAINT street_pkey ON eureka_public.street IS E'@omit';

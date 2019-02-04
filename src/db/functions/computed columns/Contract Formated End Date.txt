@@ -1,0 +1,5 @@
+CREATE OR REPLACE FUNCTION eureka_public.client_contract_formated_end_date(
+    contract eureka_public.client_contract
+) RETURNS TEXT AS $$
+    SELECT TO_CHAR(contract.end_date, 'TMDay, dd "de" TMMonth "de" YYYY - HH12:MI:SS AM');
+$$ LANGUAGE SQL STABLE;

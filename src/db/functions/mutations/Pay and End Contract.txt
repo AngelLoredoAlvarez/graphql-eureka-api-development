@@ -1,0 +1,12 @@
+CREATE OR REPLACE FUNCTION eureka_public.pay_and_end_client_contract(
+    id_contract UUID
+) RETURNS eureka_public.client_contract AS $$
+    UPDATE
+        eureka_public.client_contract
+    SET
+        status = 'Finalizado'
+    WHERE
+        id = $1
+    RETURNING
+        *;
+$$ LANGUAGE SQL VOLATILE STRICT;

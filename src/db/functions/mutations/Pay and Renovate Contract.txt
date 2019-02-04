@@ -1,0 +1,29 @@
+CREATE OR REPLACE FUNCTION eureka_public.pay_and_renovate_client_contract(
+    id_contract UUID,
+    type_contract TEXT
+) RETURNS eureka_public.client_contract AS $$
+    DECLARE
+        renovated_contract eureka_public.client_contract;
+        translated_type_contract TEXT;
+    BEGIN
+        IF $2 = '1 MES' THEN
+            translated_type_contract = REPLACE($2, 'MES', 'MONTH');
+        ELSE
+            translated_type_contract = REPLACE($2, 'MESES', 'MONTHS');
+        END IF;
+
+        UPDATE
+            eureka_public.client_contract
+        SET
+            type_contract = $2,
+            start_date = NOW(),
+            end_date = NOW() + translated_type_contract::INTERVAL,
+            status = 'Activo'
+        WHERE
+            id = $1
+        RETURNING * INTO 
+            renovated_contract;
+
+        RETURN renovated_contract;
+    END;
+$$ LANGUAGE PLPGSQL VOLATILE STRICT;

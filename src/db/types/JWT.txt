@@ -1,0 +1,4 @@
+CREATE TYPE eureka_private.jwt_token AS (
+    role TEXT,
+    id_employee UUID
+);

@@ -1,0 +1,15 @@
+CREATE OR REPLACE FUNCTION eureka_public.all_contracts_to_pay() RETURNS SETOF eureka_public.client_contract AS $$
+    SELECT
+        *
+    FROM
+        eureka_public.client_contract
+    WHERE
+        DATE(eureka_public.client_contract.end_date) = DATE(NOW())
+    AND
+        eureka_public.client_contract.status
+    LIKE
+        'Por Pagar'
+    ORDER BY
+        eureka_public.client_contract.start_date
+    DESC;
+$$ LANGUAGE SQL STABLE;

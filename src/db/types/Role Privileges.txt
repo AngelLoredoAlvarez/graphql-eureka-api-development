@@ -1,0 +1,5 @@
+CREATE TYPE eureka_public.role_privileges AS (
+    module TEXT,
+    add_modify BOOLEAN,
+    delete BOOLEAN
+);

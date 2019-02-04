@@ -1,0 +1,9 @@
+CREATE OR REPLACE FUNCTION eureka_public.delete_client(
+    id UUID
+) RETURNS eureka_public.client AS $$
+    DELETE FROM
+        eureka_public.client
+    WHERE
+        eureka_public.client.id = $1
+    RETURNING *;
+$$ LANGUAGE SQL STRICT VOLATILE;

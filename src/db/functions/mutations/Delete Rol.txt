@@ -1,0 +1,17 @@
+CREATE OR REPLACE FUNCTION eureka_public.delete_role(
+    role_name TEXT
+) RETURNS TEXT AS $$
+    BEGIN
+        EXECUTE
+            'REVOKE CONNECT ON DATABASE eureka FROM ' || $1 || ';' ||
+            'REVOKE USAGE ON SCHEMA eureka_private FROM ' || $1 || ';' ||
+            'REVOKE USAGE ON SCHEMA eureka_public FROM ' || $1 || ';' ||
+            'REVOKE ALL ON ALL FUNCTIONS IN SCHEMA eureka_private FROM ' || $1 || ';' ||
+            'REVOKE ALL ON ALL FUNCTIONS IN SCHEMA eureka_public FROM ' || $1 || ';' ||
+            'REVOKE ALL ON ALL TABLES IN SCHEMA eureka_private FROM ' || $1 || ';' ||
+            'REVOKE ALL ON ALL TABLES IN SCHEMA eureka_public FROM ' || $1 || ';' ||
+            'DROP ROLE ' || $1 || ';';
+
+        RETURN $1;
+    END;
+$$ LANGUAGE PLPGSQL VOLATILE STRICT;
