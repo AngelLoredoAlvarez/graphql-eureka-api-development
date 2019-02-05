@@ -24,7 +24,7 @@ const OPTIONS = {
   graphiqlRoute: "/graphiql",
   graphiql: process.env.NODE_ENV === "development",
   enhanceGraphiql: process.env.NODE_ENV === "development",
-  enableCors: process.env.NODE_ENV === "development",
+  enableCors: true,
   jwtSecret: process.env.JWT_SECRET,
   jwtPgTypeIdentifier: "eureka_private.jwt_token",
   disableQueryLog: process.env.NODE_ENV === "production"
