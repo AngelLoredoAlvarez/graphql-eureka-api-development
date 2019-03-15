@@ -1,0 +1,20 @@
+CREATE OR REPLACE FUNCTION eureka_public.update_contracts_status() RETURNS VOID AS $$
+    DECLARE
+        contract eureka_public.client_contract;
+    BEGIN
+        FOR contract IN
+            SELECT
+                *
+            FROM
+                eureka_public.client_contract
+            WHERE
+                TO_CHAR(end_date, 'MM-YYYY') = TO_CHAR(NOW(), 'MM-YYYY')    
+        LOOP
+            IF (TO_CHAR(contract.end_date, 'DD-MM-YYYY') = TO_CHAR(NOW(), 'DD-MM-YYYY')) THEN
+                UPDATE eureka_public.client_contract SET status = 'Por Pagar' WHERE id = contract.id;
+            ELSEIF (TO_CHAR(contract.end_date, 'DD-MM-YYYY') < TO_CHAR(NOW(), 'DD-MM-YYYY')) THEN
+                UPDATE eureka_public.client_contract SET status = 'Adeudo' WHERE id = contract.id;
+            END IF;
+        END LOOP;
+    END;
+$$ LANGUAGE PLPGSQL VOLATILE;
