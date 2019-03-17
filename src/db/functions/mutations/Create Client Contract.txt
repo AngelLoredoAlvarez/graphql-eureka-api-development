@@ -23,8 +23,7 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                 UNACCENT(eureka_public.client_contract.business)
             LIKE
                 UNACCENT($1)
-        )
-        THEN
+        ) THEN
             RAISE EXCEPTION USING 
                 MESSAGE = 'El contrato para el Negocio ' || $1 || ' ya fue registrado.',
                 HINT = 'Contrato ya Registrado';
@@ -58,6 +57,68 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                 'Activo',
                 $9
             ) RETURNING * INTO created_client_contract;
+
+            IF $7 = '1 MES' THEN
+                INSERT INTO eureka_public.client_contract_payment_date(
+                    payment_date,
+                    status,
+                    id_contract
+                ) VALUES (
+                    created_client_contract.start_date,
+                    'Pagado',
+                    created_client_contract.id
+                );
+            ELSEIF $7 = '2 MESES' THEN
+                INSERT INTO eureka_public.client_contract_payment_date(
+                    payment_date,
+                    status,
+                    id_contract
+                ) VALUES (
+                    created_client_contract.start_date,
+                    'Pagado',
+                    created_client_contract.id
+                );
+
+                INSERT INTO eureka_public.client_contract_payment_date(
+                    payment_date,
+                    status,
+                    id_contract
+                ) VALUES (
+                    created_client_contract.start_date + '1 MONTH 3 DAYS'::INTERVAL,
+                    'Por Pagar',
+                    created_client_contract.id
+                );
+            ELSEIF $7 = '3 MESES' THEN
+                INSERT INTO eureka_public.client_contract_payment_date(
+                    payment_date,
+                    status,
+                    id_contract
+                ) VALUES (
+                    created_client_contract.start_date,
+                    'Pagado',
+                    created_client_contract.id
+                );
+
+                INSERT INTO eureka_public.client_contract_payment_date(
+                    payment_date,
+                    status,
+                    id_contract
+                ) VALUES (
+                    created_client_contract.start_date + '1 MONTH 3 DAYS'::INTERVAL,
+                    'Por Pagar',
+                    created_client_contract.id
+                );
+
+                INSERT INTO eureka_public.client_contract_payment_date(
+                    payment_date,
+                    status,
+                    id_contract
+                ) VALUES (
+                    created_client_contract.start_date + '2 MONTHS 3 DAYS'::INTERVAL,
+                    'Por Pagar',
+                    created_client_contract.id
+                );
+            END IF;
 
             IF ARRAY_LENGTH($8, 1) > 0 THEN
                 FOREACH business_contact IN ARRAY $8 LOOP
