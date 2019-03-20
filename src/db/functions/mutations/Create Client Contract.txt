@@ -59,19 +59,19 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
             ) RETURNING * INTO created_client_contract;
 
             IF $7 = '1 MES' THEN
-                INSERT INTO eureka_public.client_contract_payment_date(
-                    payment_date,
-                    status,
+                INSERT INTO eureka_public.client_contract_movement(
+                    date,
+                    movement,
                     id_contract
-                ) VALUES (
+                ) VALUES(
                     created_client_contract.start_date,
                     'Pagado',
                     created_client_contract.id
                 );
             ELSEIF $7 = '2 MESES' THEN
-                INSERT INTO eureka_public.client_contract_payment_date(
-                    payment_date,
-                    status,
+                INSERT INTO eureka_public.client_contract_movement(
+                    date,
+                    movement,
                     id_contract
                 ) VALUES (
                     created_client_contract.start_date,
@@ -79,9 +79,9 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                     created_client_contract.id
                 );
 
-                INSERT INTO eureka_public.client_contract_payment_date(
-                    payment_date,
-                    status,
+                INSERT INTO eureka_public.client_contract_movement(
+                    date,
+                    movement,
                     id_contract
                 ) VALUES (
                     created_client_contract.start_date + '1 MONTH 3 DAYS'::INTERVAL,
@@ -89,9 +89,9 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                     created_client_contract.id
                 );
             ELSEIF $7 = '3 MESES' THEN
-                INSERT INTO eureka_public.client_contract_payment_date(
-                    payment_date,
-                    status,
+                INSERT INTO eureka_public.client_contract_movement(
+                    date,
+                    movement,
                     id_contract
                 ) VALUES (
                     created_client_contract.start_date,
@@ -99,9 +99,9 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                     created_client_contract.id
                 );
 
-                INSERT INTO eureka_public.client_contract_payment_date(
-                    payment_date,
-                    status,
+                INSERT INTO eureka_public.client_contract_movement(
+                    date,
+                    movement,
                     id_contract
                 ) VALUES (
                     created_client_contract.start_date + '1 MONTH 3 DAYS'::INTERVAL,
@@ -109,9 +109,9 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                     created_client_contract.id
                 );
 
-                INSERT INTO eureka_public.client_contract_payment_date(
-                    payment_date,
-                    status,
+                INSERT INTO eureka_public.client_contract_movement(
+                    date,
+                    movement,
                     id_contract
                 ) VALUES (
                     created_client_contract.start_date + '2 MONTHS 3 DAYS'::INTERVAL,

@@ -1,0 +1,10 @@
+CREATE OR REPLACE FUNCTION eureka_public.all_clients_debts() RETURNS SETOF eureka_public.client_contract_movement AS $$
+    SELECT
+        *
+    FROM
+        eureka_public.client_contract_movement
+    WHERE
+        movement
+    LIKE
+        'Adeudo';
+$$ LANGUAGE SQL STABLE;

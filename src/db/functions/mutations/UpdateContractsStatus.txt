@@ -1,19 +1,24 @@
 CREATE OR REPLACE FUNCTION eureka_public.update_contracts_status() RETURNS VOID AS $$
     DECLARE
-        contract eureka_public.client_contract;
+        payment_movement eureka_public.client_contract_movement;
     BEGIN
-        FOR contract IN
+        FOR payment_movement IN
             SELECT
                 *
             FROM
-                eureka_public.client_contract
+                eureka_public.client_contract_movement
             WHERE
-                TO_CHAR(end_date, 'MM-YYYY') = TO_CHAR(NOW(), 'MM-YYYY')    
+                TO_CHAR(date, 'MM-YYYY') = TO_CHAR(NOW(), 'MM-YYYY')
+            AND
+                movement
+            LIKE
+                'Por Pagar'
         LOOP
-            IF (TO_CHAR(contract.end_date, 'DD-MM-YYYY') = TO_CHAR(NOW(), 'DD-MM-YYYY')) THEN
-                UPDATE eureka_public.client_contract SET status = 'Por Pagar' WHERE id = contract.id;
-            ELSEIF (TO_CHAR(contract.end_date, 'DD-MM-YYYY') < TO_CHAR(NOW(), 'DD-MM-YYYY')) THEN
-                UPDATE eureka_public.client_contract SET status = 'Adeudo' WHERE id = contract.id;
+            IF (TO_CHAR(payment_movement.date, 'DD-MM-YYYY') = TO_CHAR(NOW(), 'DD-MM-YYYY')) THEN
+                UPDATE eureka_public.client_contract SET status = 'Por Pagar' WHERE id = payment_movement.id_contract;
+            ELSEIF (TO_CHAR(payment_movement.date, 'DD-MM-YYYY') < TO_CHAR(NOW(), 'DD-MM-YYYY')) THEN
+                UPDATE eureka_public.client_contract SET status = 'Adeudo' WHERE id = payment_movement.id_contract;
+                UPDATE eureka_public.client_contract_movement SET movement = 'Adeudo' WHERE date = payment_movement.date AND id_contract = payment_movement.id_contract;
             END IF;
         END LOOP;
     END;

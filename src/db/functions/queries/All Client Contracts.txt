@@ -1,0 +1,13 @@
+CREATE OR REPLACE FUNCTION eureka_public.all_client_contracts(
+    id_client UUID
+) RETURNS SETOF eureka_public.client_contract AS $$
+    SELECT
+        *
+    FROM
+        eureka_public.client_contract
+    WHERE
+        id_client = $1
+    ORDER BY
+        start_date
+    DESC;
+$$ LANGUAGE SQL STRICT STABLE;

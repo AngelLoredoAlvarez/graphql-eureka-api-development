@@ -1,8 +1,0 @@
-CREATE TABLE eureka_public.client_contract_payment_date(
-    payment_date TIMESTAMPTZ,
-    status TEXT NOT NULL,
-    id_contract UUID NOT NULL REFERENCES eureka_public.client_contract(id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
-INDEX
-CREATE INDEX client_contract_payment_date_idx ON eureka_public.client_contract_payment_date(id_contract);
