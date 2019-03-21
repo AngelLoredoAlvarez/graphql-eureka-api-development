@@ -1,0 +1,43 @@
+CREATE OR REPLACE FUNCTION eureka_public.collect_contract_debt(
+    date_of_debt TIMESTAMPTZ,
+    id_contract UUID
+) RETURNS eureka_public.client_contract_movement AS $$
+    DECLARE
+        updated_contract_movement eureka_public.client_contract_movement;
+        contract_movement eureka_public.client_contract_movement;
+    BEGIN
+        UPDATE
+            eureka_public.client_contract_movement
+        SET
+            date = NOW(),
+            movement = 'Pagado'
+        WHERE
+            eureka_public.client_contract_movement.date = $1
+        AND
+            eureka_public.client_contract_movement.id_contract = $2
+        RETURNING
+            *
+        INTO
+            updated_contract_movement;
+
+        IF NOT EXISTS(SELECT 1 FROM eureka_public.client_contract_movement WHERE eureka_public.client_contract_movement.movement = 'Adeudo' AND eureka_public.client_contract_movement.id_contract = $2) THEN
+            IF EXISTS(SELECT 1 FROM eureka_public.client_contract_movement WHERE eureka_public.client_contract_movement.movement = 'Por Pagar' AND eureka_public.client_contract_movement.id_contract = $2) THEN
+                UPDATE
+                    eureka_public.client_contract
+                SET
+                    status = 'Activo'
+                WHERE
+                    id = $2;
+            ELSE
+                UPDATE
+                    eureka_public.client_contract
+                SET
+                    status = 'Finalizado'
+                WHERE
+                    id = $2;
+            END IF;
+        END IF;
+
+        RETURN updated_contract_movement;
+    END;
+$$ LANGUAGE PLPGSQL STRICT VOLATILE;
