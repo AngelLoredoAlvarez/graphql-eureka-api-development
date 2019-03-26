@@ -6,5 +6,8 @@ CREATE OR REPLACE FUNCTION eureka_public.all_clients_debts() RETURNS SETOF eurek
     WHERE
         movement
     LIKE
-        'Adeudo';
+        'Adeudo'
+    ORDER BY
+        date
+    DESC;
 $$ LANGUAGE SQL STABLE;

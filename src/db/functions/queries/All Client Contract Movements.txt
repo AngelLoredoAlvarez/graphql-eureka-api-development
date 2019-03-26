@@ -6,5 +6,8 @@ CREATE OR REPLACE FUNCTION eureka_public.all_client_contract_movements(
     FROM
         eureka_public.client_contract_movement
     WHERE
-        id_contract = $1;
+        id_contract = $1
+    ORDER BY
+        date
+    DESC;
 $$ LANGUAGE SQL STRICT STABLE;
