@@ -42,7 +42,7 @@ CREATE OR REPLACE FUNCTION eureka_public.create_role(
                 'GRANT EXECUTE ON FUNCTION eureka_public.client_contract_formated_end_date TO ' || role || ';' ||
                 'GRANT EXECUTE ON FUNCTION eureka_public.update_contracts_status TO ' || role || ';' ||
                 'GRANT EXECUTE ON FUNCTION eureka_public.all_contracts_to_pay TO ' || role || ';' ||
-                'GRANT EXECUTE ON FUNCTION eureka_public.pay_and_end_client_contract TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.charge_month TO ' || role || ';' ||
                 'GRANT EXECUTE ON FUNCTION eureka_public.pay_and_renovate_client_contract TO ' || role || ';';
 
             FOREACH privileges IN ARRAY $2 LOOP

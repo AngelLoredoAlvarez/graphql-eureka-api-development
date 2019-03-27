@@ -3,13 +3,27 @@ CREATE OR REPLACE FUNCTION eureka_public.delete_client(
 ) RETURNS eureka_public.client AS $$
     DECLARE
         selected_id_contract UUID;
+        selected_status_contract TEXT;
         client eureka_public.client;
     BEGIN
-        SELECT eureka_public.client_contract.id FROM eureka_public.client_contract WHERE id_client = $1 INTO selected_id_contract;
+        SELECT
+            eureka_public.client_contract.id,
+            eureka_public.client_contract.status
+        INTO
+            selected_id_contract,
+            selected_status_contract
+        FROM
+            eureka_public.client_contract
+        WHERE
+            id_client = $1;
 
         SELECT * FROM eureka_public.client WHERE eureka_public.client.id = $1 INTO client;
 
-        IF EXISTS (SELECT * FROM eureka_public.client_contract_movement WHERE eureka_public.client_contract_movement.movement LIKE 'Adeudo' AND eureka_public.client_contract_movement.id_contract = selected_id_contract) THEN
+        IF selected_status_contract = 'Activo' THEN
+            RAISE EXCEPTION USING 
+                MESSAGE = 'El cliente ' || client.name || ' ' || client.first_name || ' ' || client.last_name || ' no puede ser eliminado pues el periodo de su contrato aun no finaliza.',
+                HINT = 'Contrato aun Activo';
+        ELSEIF EXISTS (SELECT * FROM eureka_public.client_contract_movement WHERE eureka_public.client_contract_movement.movement LIKE 'Adeudo' AND eureka_public.client_contract_movement.id_contract = selected_id_contract) THEN
             RAISE EXCEPTION USING 
                 MESSAGE = 'El cliente ' || client.name || ' ' || client.first_name || ' ' || client.last_name || ' no puede ser eliminado pues tiene adeudos pendientes.',
                 HINT = 'Adeudos Pendientes';

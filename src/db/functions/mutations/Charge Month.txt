@@ -1,0 +1,15 @@
+CREATE OR REPLACE FUNCTION eureka_public.charge_month(
+    id_contract UUID
+) RETURNS eureka_public.client_contract_movement AS $$
+    UPDATE
+        eureka_public.client_contract_movement
+    SET
+        date = NOW(),
+        movement = 'Pagado'
+    WHERE
+        TO_CHAR(date, 'DD-MM-YYYY') = TO_CHAR(NOW(), 'DD-MM-YYYY')
+    AND
+        id_contract = $1
+    RETURNING
+        *;
+$$ LANGUAGE SQL STRICT VOLATILE;

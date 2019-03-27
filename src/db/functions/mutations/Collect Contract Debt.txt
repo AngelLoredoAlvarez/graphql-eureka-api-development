@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION eureka_public.collect_contract_debt(
     date_of_debt TIMESTAMPTZ,
     id_contract UUID
-) RETURNS eureka_public.client_contract_movement AS $$
+) RETURNS VOID AS $$
     DECLARE
         updated_contract_movement eureka_public.client_contract_movement;
         contract eureka_public.client_contract;
@@ -65,6 +65,6 @@ CREATE OR REPLACE FUNCTION eureka_public.collect_contract_debt(
             END IF;
         END IF;
 
-        RETURN updated_contract_movement;
+        RETURN;
     END;
 $$ LANGUAGE PLPGSQL STRICT VOLATILE;
