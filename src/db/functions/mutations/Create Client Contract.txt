@@ -58,6 +58,20 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                 $9
             ) RETURNING * INTO created_client_contract;
 
+            IF ARRAY_LENGTH($8, 1) > 0 THEN
+                FOREACH business_contact IN ARRAY $8 LOOP
+                    INSERT INTO eureka_public.business_contact(
+                        type_contact,
+                        contact,
+                        id_contract
+                    ) VALUES(
+                        business_contact.type_contact,
+                        business_contact.contact,
+                        created_client_contract.id
+                    );
+                END LOOP;
+            END IF;
+
             IF $7 = '1 MES' THEN
                 INSERT INTO eureka_public.client_contract_movement(
                     date,
@@ -118,20 +132,6 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                     'Por Pagar',
                     created_client_contract.id
                 );
-            END IF;
-
-            IF ARRAY_LENGTH($8, 1) > 0 THEN
-                FOREACH business_contact IN ARRAY $8 LOOP
-                    INSERT INTO eureka_public.business_contact(
-                        type_contact,
-                        contact,
-                        id_contract
-                    ) VALUES(
-                        business_contact.type_contact,
-                        business_contact.contact,
-                        created_client_contract.id
-                    );
-                END LOOP;
             END IF;
         END IF;
 

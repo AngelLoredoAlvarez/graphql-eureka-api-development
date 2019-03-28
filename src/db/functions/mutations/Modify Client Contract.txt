@@ -10,25 +10,19 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client_contract(
     id UUID
 ) RETURNS eureka_public.client_contract AS $$
     DECLARE
-        modified_client_contract eureka_public.client_contract;
+        selected_contract eureka_public.client_contract;
         translated_type_contract TEXT;
+        modified_client_contract eureka_public.client_contract;
         contract_start_date TIMESTAMPTZ;
         business_contact eureka_public.contact;
     BEGIN
+        SELECT * FROM eureka_public.client_contract WHERE eureka_public.client_contract.id = $9 INTO selected_contract;
+
         IF $7 = '1 MES' THEN
             translated_type_contract = REPLACE($7, 'MES', 'MONTH');
         ELSE
             translated_type_contract = REPLACE($7, 'MESES', 'MONTHS');
         END IF;
-
-        SELECT
-            eureka_public.client_contract.start_date
-        INTO
-            contract_start_date
-        FROM
-            eureka_public.client_contract
-        WHERE
-            eureka_public.client_contract.id = $9;
 
         UPDATE
             eureka_public.client_contract
@@ -39,8 +33,7 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client_contract(
             id_street = $4,
             exterior_number = $5,
             interior_number = $6,
-            type_contract = $7,
-            end_date = contract_start_date + translated_type_contract::INTERVAL
+            type_contract = $7
         WHERE
             client_contract.id = $9
         RETURNING
@@ -62,6 +55,72 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client_contract(
                     $9
                 );
             END LOOP;
+        END IF;
+
+        IF selected_contract.status = 'Activo' THEN
+            DELETE FROM eureka_public.client_contract_movement WHERE date BETWEEN selected_contract.start_date AND selected_contract.end_date AND id_contract = selected_contract.id;
+
+            IF $7 = '1 MES' THEN
+                INSERT INTO eureka_public.client_contract_movement(
+                    date,
+                    movement,
+                    id_contract
+                ) VALUES(
+                    modified_client_contract.start_date,
+                    'Pagado',
+                    modified_client_contract.id
+                );
+            ELSEIF $7 = '2 MESES' THEN
+                INSERT INTO eureka_public.client_contract_movement(
+                    date,
+                    movement,
+                    id_contract
+                ) VALUES (
+                    modified_client_contract.start_date,
+                    'Pagado',
+                    modified_client_contract.id
+                );
+
+                INSERT INTO eureka_public.client_contract_movement(
+                    date,
+                    movement,
+                    id_contract
+                ) VALUES (
+                    modified_client_contract.start_date + '1 MONTH 3 DAYS'::INTERVAL,
+                    'Por Pagar',
+                    modified_client_contract.id
+                );
+            ELSEIF $7 = '3 MESES' THEN
+                INSERT INTO eureka_public.client_contract_movement(
+                    date,
+                    movement,
+                    id_contract
+                ) VALUES (
+                    modified_client_contract.start_date,
+                    'Pagado',
+                    modified_client_contract.id
+                );
+
+                INSERT INTO eureka_public.client_contract_movement(
+                    date,
+                    movement,
+                    id_contract
+                ) VALUES (
+                    modified_client_contract.start_date + '1 MONTH 3 DAYS'::INTERVAL,
+                    'Por Pagar',
+                    modified_client_contract.id
+                );
+
+                INSERT INTO eureka_public.client_contract_movement(
+                    date,
+                    movement,
+                    id_contract
+                ) VALUES (
+                    modified_client_contract.start_date + '2 MONTHS 3 DAYS'::INTERVAL,
+                    'Por Pagar',
+                    modified_client_contract.id
+                );
+            END IF;
         END IF;
 
         RETURN modified_client_contract;
