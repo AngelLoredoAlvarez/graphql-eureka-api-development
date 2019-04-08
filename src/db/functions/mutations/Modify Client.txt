@@ -6,7 +6,6 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client(
     id_township UUID,
     id_street UUID,
     exterior_number TEXT,
-    interior_number TEXT,
     contacts eureka_public.contact[],
     id UUID
 ) RETURNS eureka_public.client AS $$
@@ -23,19 +22,18 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client(
             id_town = $4,
             id_township = $5,
             id_street = $6,
-            exterior_number = $7,
-            interior_number = $8
+            exterior_number = $7
         WHERE
-            client.id = $10
+            client.id = $9
         RETURNING
             *
         INTO
             modified_client;
 
-        DELETE FROM eureka_public.client_contact WHERE id_client = $10;
+        DELETE FROM eureka_public.client_contact WHERE id_client = $9;
         
-        IF ARRAY_LENGTH($9, 1) > 0 THEN
-            FOREACH client_contact IN ARRAY $9 LOOP
+        IF ARRAY_LENGTH($8, 1) > 0 THEN
+            FOREACH client_contact IN ARRAY $8 LOOP
                 INSERT INTO eureka_public.client_contact(
                     type_contact,
                     contact,
@@ -43,7 +41,7 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client(
                 ) VALUES(
                     client_contact.type_contact,
                     client_contact.contact,
-                    $10
+                    $9
                 );
             END LOOP;
         END IF;

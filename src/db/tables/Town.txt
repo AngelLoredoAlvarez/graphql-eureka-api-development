@@ -3,8 +3,5 @@ CREATE TABLE eureka_public.town(
     town TEXT NOT NULL UNIQUE
 );
 
-Omit the query townById
-COMMENT ON CONSTRAINT town_pkey ON eureka_public.town IS E'@omit';
-
 Omit the query townByTown
 COMMENT ON CONSTRAINT town_town_key ON eureka_public.town IS E'@omit';

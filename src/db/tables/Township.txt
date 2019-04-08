@@ -9,8 +9,5 @@ CREATE TABLE eureka_public.township(
 Index
 CREATE INDEX township_id_town_idx ON eureka_public.township(id_town);
 
-Omit the query townshipById
-COMMENT ON CONSTRAINT township_pkey ON eureka_public.township IS E'@omit';
-
 Omit the query townshipByPostalCode
 COMMENT ON CONSTRAINT township_postal_code_key ON eureka_public.township IS E'@omit';

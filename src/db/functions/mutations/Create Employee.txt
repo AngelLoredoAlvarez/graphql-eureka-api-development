@@ -6,7 +6,6 @@ CREATE OR REPLACE FUNCTION eureka_public.create_employee(
     id_township UUID,
     id_street UUID,
     exterior_number TEXT,
-    interior_number TEXT,
     contacts eureka_public.contact[],
     username TEXT,
     password TEXT,
@@ -46,10 +45,10 @@ CREATE OR REPLACE FUNCTION eureka_public.create_employee(
                 WHERE
                     UNACCENT(eureka_private.user.username)
                 ILIKE
-                    UNACCENT($10)
+                    UNACCENT($9)
             ) THEN
                 RAISE EXCEPTION USING 
-                    MESSAGE = 'El nombre de usuario ' || $10 || ' ya fue registrado por otro empleado.',
+                    MESSAGE = 'El nombre de usuario ' || $9 || ' ya fue registrado por otro empleado.',
                     HINT = 'Nombre de Usuario ya Registrado';
             ELSE
                 INSERT INTO eureka_public.employee(
@@ -59,12 +58,11 @@ CREATE OR REPLACE FUNCTION eureka_public.create_employee(
                     id_town,
                     id_township,
                     id_street,
-                    exterior_number,
-                    interior_number
-                ) VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING * INTO created_employee;
+                    exterior_number
+                ) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING * INTO created_employee;
 
-                IF ARRAY_LENGTH($9, 1) > 0 THEN
-                    FOREACH employee_contact IN ARRAY $9 LOOP
+                IF ARRAY_LENGTH($8, 1) > 0 THEN
+                    FOREACH employee_contact IN ARRAY $8 LOOP
                         INSERT INTO eureka_public.employee_contact(
                             type_contact,
                             contact,
@@ -83,9 +81,9 @@ CREATE OR REPLACE FUNCTION eureka_public.create_employee(
                     role,
                     id_employee
                 ) VALUES(
-                    $10,
-                    CRYPT($11, GEN_SALT('BF', 8)),
-                    $12,
+                    $9,
+                    CRYPT($10, GEN_SALT('BF', 8)),
+                    $11,
                     created_employee.id
                 );
             END IF;

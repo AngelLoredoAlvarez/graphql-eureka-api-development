@@ -7,7 +7,6 @@ CREATE OR REPLACE FUNCTION eureka_public.client_contract_full_address(
         township TEXT;
         street TEXT;
         exterior_number TEXT;
-        interior_number TEXT;
         full_address TEXT;
     BEGIN
         SELECT
@@ -15,15 +14,13 @@ CREATE OR REPLACE FUNCTION eureka_public.client_contract_full_address(
             eureka_public.township.type_township,
             eureka_public.township.township,
             eureka_public.street.street,
-            eureka_public.client_contract.exterior_number,
-            eureka_public.client_contract.interior_number
+            eureka_public.client_contract.exterior_number
         INTO
             town,
             type_township,
             township,
             street,
-            exterior_number,
-            interior_number
+            exterior_number
         FROM
             eureka_public.town
         INNER JOIN
@@ -41,11 +38,7 @@ CREATE OR REPLACE FUNCTION eureka_public.client_contract_full_address(
         WHERE
             eureka_public.client_contract.id = client_contract_table.id;
 
-        IF (SELECT client_contract_table.interior_number <> '') THEN
-            full_address := street || ' #' || exterior_number || ', Int. ' || interior_number || ', ' || type_township || ' ' || township || ', ' || town;
-        ELSE
-            full_address := street || ' #' || exterior_number || ', ' || type_township || ' ' || township || ', ' || town;
-        END IF;
+        full_address := street || ' #' || exterior_number || ', ' || type_township || ' ' || township || ', ' || town;
 
         RETURN full_address;
     END;

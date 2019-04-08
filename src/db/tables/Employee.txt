@@ -7,7 +7,6 @@ CREATE TABLE eureka_public.employee(
     id_township UUID NOT NULL REFERENCES eureka_public.township(id),
     id_street UUID NOT NULL REFERENCES eureka_public.street(id),
     exterior_number VARCHAR(5) NOT NULL,
-    interior_number VARCHAR(5),
     created_at TIMESTAMP DEFAULT NOW()
 );
 

@@ -1,0 +1,6 @@
+CREATE OR REPLACE FUNCTION eureka_public.modify_town(
+    id UUID,
+    town TEXT
+) RETURNS eureka_public.town AS $$
+    UPDATE eureka_public.town SET town = $2 WHERE id = $1 RETURNING *;
+$$ LANGUAGE SQL STRICT VOLATILE;

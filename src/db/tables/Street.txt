@@ -6,6 +6,3 @@ CREATE TABLE eureka_public.street(
 
 Index
 CREATE INDEX street_id_township_idx ON eureka_public.street(id_township);
-
-Omit the query streetById
-COMMENT ON CONSTRAINT street_pkey ON eureka_public.street IS E'@omit';

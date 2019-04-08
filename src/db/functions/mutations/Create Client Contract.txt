@@ -4,7 +4,6 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
     id_township UUID,
     id_street UUID,
     exterior_number TEXT,
-    interior_number TEXT,
     type_contract TEXT,
     contacts eureka_public.contact[],
     id_client UUID
@@ -28,10 +27,10 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                 MESSAGE = 'El contrato para el Negocio ' || $1 || ' ya fue registrado.',
                 HINT = 'Contrato ya Registrado';
         ELSE
-            IF $7 = '1 MES' THEN
-                translated_type_contract = REPLACE($7, 'MES', 'MONTH');
+            IF $6 = '1 MES' THEN
+                translated_type_contract = REPLACE($6, 'MES', 'MONTH');
             ELSE
-                translated_type_contract = REPLACE($7, 'MESES', 'MONTHS');
+                translated_type_contract = REPLACE($6, 'MESES', 'MONTHS');
             END IF;
 
             INSERT INTO eureka_public.client_contract(
@@ -40,7 +39,6 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                 id_township,
                 id_street,
                 exterior_number,
-                interior_number,
                 type_contract,
                 end_date,
                 status,
@@ -52,14 +50,13 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                 $4,
                 $5,
                 $6,
-                $7,
                 NOW() + translated_type_contract::INTERVAL,
                 'Activo',
-                $9
+                $8
             ) RETURNING * INTO created_client_contract;
 
-            IF ARRAY_LENGTH($8, 1) > 0 THEN
-                FOREACH business_contact IN ARRAY $8 LOOP
+            IF ARRAY_LENGTH($7, 1) > 0 THEN
+                FOREACH business_contact IN ARRAY $7 LOOP
                     INSERT INTO eureka_public.business_contact(
                         type_contact,
                         contact,
@@ -72,7 +69,7 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                 END LOOP;
             END IF;
 
-            IF $7 = '1 MES' THEN
+            IF $6 = '1 MES' THEN
                 INSERT INTO eureka_public.client_contract_movement(
                     date,
                     movement,
@@ -82,7 +79,7 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                     'Pagado',
                     created_client_contract.id
                 );
-            ELSEIF $7 = '2 MESES' THEN
+            ELSEIF $6 = '2 MESES' THEN
                 INSERT INTO eureka_public.client_contract_movement(
                     date,
                     movement,
@@ -102,7 +99,7 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                     'Por Pagar',
                     created_client_contract.id
                 );
-            ELSEIF $7 = '3 MESES' THEN
+            ELSEIF $6 = '3 MESES' THEN
                 INSERT INTO eureka_public.client_contract_movement(
                     date,
                     movement,

@@ -1,0 +1,15 @@
+CREATE OR REPLACE FUNCTION eureka_public.modify_street(
+    street TEXT,
+    id_township UUID,
+    id UUID
+) RETURNS eureka_public.street AS $$
+    UPDATE
+        eureka_public.street
+    SET
+        street = $1,
+        id_township = $2
+    WHERE
+        id = $3
+    RETURNING
+        *;
+$$ LANGUAGE SQL VOLATILE STRICT;

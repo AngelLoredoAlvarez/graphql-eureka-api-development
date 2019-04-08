@@ -20,7 +20,11 @@ CREATE OR REPLACE FUNCTION eureka_public.create_role(
                 'GRANT USAGE ON SCHEMA eureka_public TO ' || role || ';' ||
                 'GRANT USAGE ON SCHEMA eureka_private TO ' || role || ';' ||
                 'GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE eureka_public.town TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.create_town TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.modify_town TO ' || role || ';' ||
                 'GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE eureka_public.township TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.create_township TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.modify_township TO ' || role || ';' || 
                 'GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE eureka_public.street TO ' || role || ';' ||
                 'GRANT SELECT ON TABLE eureka_private.user TO ' || role || ';' ||
                 'GRANT SELECT ON TABLE eureka_public.employee TO ' || role || ';' ||

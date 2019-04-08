@@ -5,7 +5,6 @@ CREATE TABLE eureka_public.client_contract(
     id_township UUID NOT NULL REFERENCES eureka_public.township(id),
     id_street UUID NOT NULL REFERENCES eureka_public.street(id),
     exterior_number VARCHAR(5) NOT NULL,
-    interior_number VARCHAR(5),
     type_contract TEXT NOT NULL,
     start_date TIMESTAMPTZ DEFAULT NOW(),
     end_date TIMESTAMPTZ,

@@ -6,7 +6,6 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_employee(
     id_township UUID,
     id_street UUID,
     exterior_number TEXT,
-    interior_number TEXT,
     contacts eureka_public.contact[],
     username TEXT,
     role TEXT,
@@ -30,16 +29,15 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_employee(
             id_town = $4,
             id_township = $5,
             id_street = $6,
-            exterior_number = $7,
-            interior_number = $8
+            exterior_number = $7
         WHERE
-            eureka_public.employee.id = $12
+            eureka_public.employee.id = $11
         RETURNING * INTO modified_employee;
 
-        DELETE FROM eureka_public.employee_contact WHERE eureka_public.employee_contact.id_employee = $12;
+        DELETE FROM eureka_public.employee_contact WHERE eureka_public.employee_contact.id_employee = $11;
 
-        IF ARRAY_LENGTH($9, 1) > 0 THEN
-            FOREACH employee_contact IN ARRAY $9 LOOP
+        IF ARRAY_LENGTH($8, 1) > 0 THEN
+            FOREACH employee_contact IN ARRAY $8 LOOP
                 INSERT INTO eureka_public.employee_contact(
                     type_contact,
                     contact,
@@ -47,7 +45,7 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_employee(
                 ) VALUES(
                     employee_contact.type_contact,
                     employee_contact.contact,
-                    $12
+                    $11
                 );
             END LOOP;
         END IF;
@@ -55,10 +53,10 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_employee(
         UPDATE
             eureka_private.user
         SET
-            username = $10,
-            role = $11
+            username = $9,
+            role = $10
         WHERE
-            eureka_private.user.id_employee = $12
+            eureka_private.user.id_employee = $11
         RETURNING 
             eureka_private.user.username,
             eureka_private.user.role 
@@ -66,13 +64,13 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_employee(
             username,
             role;
 
-        IF $13 <> 'REEMPLAZAME' THEN
+        IF $12 <> 'REEMPLAZAME' THEN
             UPDATE 
                 eureka_private.user
             SET
-                password = CRYPT($13, GEN_SALT('BF', 8))
+                password = CRYPT($12, GEN_SALT('BF', 8))
             WHERE
-                eureka_private.user.id_employee = $12;
+                eureka_private.user.id_employee = $11;
         END IF;
 
         employee_user = (username, role)::eureka_public.employee_user;

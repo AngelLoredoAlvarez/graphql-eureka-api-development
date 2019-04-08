@@ -4,7 +4,6 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client_contract(
     id_township UUID,
     id_street UUID,
     exterior_number TEXT,
-    interior_number TEXT,
     type_contract TEXT,
     contacts eureka_public.contact[],
     id UUID
@@ -16,12 +15,12 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client_contract(
         contract_start_date TIMESTAMPTZ;
         business_contact eureka_public.contact;
     BEGIN
-        SELECT * FROM eureka_public.client_contract WHERE eureka_public.client_contract.id = $9 INTO selected_contract;
+        SELECT * FROM eureka_public.client_contract WHERE eureka_public.client_contract.id = $8 INTO selected_contract;
 
-        IF $7 = '1 MES' THEN
-            translated_type_contract = REPLACE($7, 'MES', 'MONTH');
+        IF $6 = '1 MES' THEN
+            translated_type_contract = REPLACE($6, 'MES', 'MONTH');
         ELSE
-            translated_type_contract = REPLACE($7, 'MESES', 'MONTHS');
+            translated_type_contract = REPLACE($6, 'MESES', 'MONTHS');
         END IF;
 
         UPDATE
@@ -32,19 +31,20 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client_contract(
             id_township = $3,
             id_street = $4,
             exterior_number = $5,
-            interior_number = $6,
-            type_contract = $7
+            type_contract = $6,
+            start_date = selected_contract.start_date,
+            end_date = selected_contract.start_date + translated_type_contract::INTERVAL
         WHERE
-            client_contract.id = $9
+            client_contract.id = $8
         RETURNING
             *
         INTO
             modified_client_contract;
 
-        DELETE FROM eureka_public.business_contact WHERE eureka_public.business_contact.id_contract = $9;
+        DELETE FROM eureka_public.business_contact WHERE eureka_public.business_contact.id_contract = $8;
 
-        IF ARRAY_LENGTH($8, 1) > 0 THEN
-            FOREACH business_contact IN ARRAY $8 LOOP
+        IF ARRAY_LENGTH($7, 1) > 0 THEN
+            FOREACH business_contact IN ARRAY $7 LOOP
                 INSERT INTO eureka_public.business_contact(
                     type_contact,
                     contact,
@@ -52,7 +52,7 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client_contract(
                 ) VALUES(
                     business_contact.type_contact,
                     business_contact.contact,
-                    $9
+                    $8
                 );
             END LOOP;
         END IF;
@@ -60,7 +60,7 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client_contract(
         IF selected_contract.status = 'Activo' THEN
             DELETE FROM eureka_public.client_contract_movement WHERE date BETWEEN selected_contract.start_date AND selected_contract.end_date AND id_contract = selected_contract.id;
 
-            IF $7 = '1 MES' THEN
+            IF $6 = '1 MES' THEN
                 INSERT INTO eureka_public.client_contract_movement(
                     date,
                     movement,
@@ -70,7 +70,7 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client_contract(
                     'Pagado',
                     modified_client_contract.id
                 );
-            ELSEIF $7 = '2 MESES' THEN
+            ELSEIF $6 = '2 MESES' THEN
                 INSERT INTO eureka_public.client_contract_movement(
                     date,
                     movement,
@@ -90,7 +90,7 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client_contract(
                     'Por Pagar',
                     modified_client_contract.id
                 );
-            ELSEIF $7 = '3 MESES' THEN
+            ELSEIF $6 = '3 MESES' THEN
                 INSERT INTO eureka_public.client_contract_movement(
                     date,
                     movement,
