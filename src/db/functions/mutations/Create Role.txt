@@ -15,7 +15,8 @@ CREATE OR REPLACE FUNCTION eureka_public.create_role(
         ELSE
             EXECUTE 'CREATE ROLE ' || role || ' WITH LOGIN ENCRYPTED PASSWORD '' || role || '';';
             
-            EXECUTE 
+            EXECUTE
+                'GRANT ' || role || ' TO eureka_administrador;' ||
                 'GRANT CONNECT ON DATABASE eureka TO ' || role || ';' ||
                 'GRANT USAGE ON SCHEMA eureka_public TO ' || role || ';' ||
                 'GRANT USAGE ON SCHEMA eureka_private TO ' || role || ';' ||
