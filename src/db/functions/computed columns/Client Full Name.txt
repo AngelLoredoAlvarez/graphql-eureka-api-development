@@ -1,5 +1,0 @@
-CREATE OR REPLACE FUNCTION eureka_public.client_full_name(
-    client eureka_public.client
-) RETURNS TEXT AS $$
-    SELECT client.name || ' ' || client.first_name || ' ' || client.last_name;
-$$ LANGUAGE SQL STABLE;

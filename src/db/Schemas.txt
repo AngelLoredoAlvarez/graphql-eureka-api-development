@@ -1,2 +1,0 @@
-CREATE SCHEMA eureka_public;
-CREATE SCHEMA eureka_private;

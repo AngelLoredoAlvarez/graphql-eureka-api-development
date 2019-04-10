@@ -1,4 +1,5 @@
 .DS_Store
+db/
 dist/
 node_modules/
 thumbs.db

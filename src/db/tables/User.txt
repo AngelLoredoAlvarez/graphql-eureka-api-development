@@ -1,9 +1,0 @@
-CREATE TABLE eureka_private.user(
-    username TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL,
-    role TEXT NOT NULL,
-    id_employee UUID NOT NULL REFERENCES eureka_public.employee(id) ON UPDATE CASCADE ON DELETE CASCADE
-);
-
-Index
-CREATE INDEX user_id_employee_idx ON eureka_private.user(id_employee);

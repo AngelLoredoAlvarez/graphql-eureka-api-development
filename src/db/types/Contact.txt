@@ -1,4 +1,0 @@
-CREATE TYPE eureka_public.contact AS (
-    type_contact TEXT,
-    contact TEXT
-);

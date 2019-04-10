@@ -1,9 +1,0 @@
-CREATE OR REPLACE FUNCTION eureka_public.delete_employee(
-    id UUID
-) RETURNS eureka_public.employee AS $$
-    DELETE FROM
-        eureka_public.employee
-    WHERE
-        eureka_public.employee.id = $1
-    RETURNING *;
-$$ LANGUAGE SQL VOLATILE STRICT;

@@ -1,4 +1,0 @@
-CREATE TYPE eureka_public.privileges_module AS (
-    module TEXT,
-    privileges TEXT
-);

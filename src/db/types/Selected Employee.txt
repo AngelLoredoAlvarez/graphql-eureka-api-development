@@ -1,4 +1,0 @@
-CREATE TYPE eureka_public.selected_employee AS (
-    employee eureka_public.employee,
-    employee_user eureka_public.employee_user
-);

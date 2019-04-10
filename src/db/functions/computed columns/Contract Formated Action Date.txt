@@ -1,5 +1,0 @@
-CREATE OR REPLACE FUNCTION eureka_public.client_contract_movement_formated_movement_date(
-    contract_movement eureka_public.client_contract_movement
-) RETURNS TEXT AS $$
-    SELECT TO_CHAR(contract_movement.date, 'TMDay, dd "de" TMMonth "de" YYYY');
-$$ LANGUAGE SQL STABLE;
