@@ -1,0 +1,89 @@
+CREATE OR REPLACE FUNCTION eureka_public.create_role(
+    role_name TEXT,
+    role_privileges eureka_public.role_privileges[]
+) RETURNS TEXT AS $$
+    DECLARE
+        role TEXT := 'eureka_';
+        privileges eureka_public.role_privileges;
+    BEGIN
+        role := role || LOWER($1);
+
+        IF (SELECT 1 FROM pg_user WHERE usename ILIKE ('%' || role || '%')) THEN
+            RAISE EXCEPTION USING 
+                MESSAGE = 'Ese rol ya fue registrado.',
+                HINT = 'Rol ya Registrado';
+        ELSE
+            EXECUTE 'CREATE ROLE ' || role || ' WITH LOGIN ENCRYPTED PASSWORD '' || role || '';';
+            
+            EXECUTE
+                'GRANT ' || role || ' TO eureka_administrador;' ||
+                'GRANT CONNECT ON DATABASE eureka TO ' || role || ';' ||
+                'GRANT USAGE ON SCHEMA eureka_public TO ' || role || ';' ||
+                'GRANT USAGE ON SCHEMA eureka_private TO ' || role || ';' ||
+                'GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE eureka_public.town TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.create_town TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.modify_town TO ' || role || ';' ||
+                'GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE eureka_public.township TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.create_township TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.modify_township TO ' || role || ';' || 
+                'GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE eureka_public.street TO ' || role || ';' ||
+                'GRANT SELECT ON TABLE eureka_private.user TO ' || role || ';' ||
+                'GRANT SELECT ON TABLE eureka_public.employee TO ' || role || ';' ||
+                'GRANT SELECT ON TABLE eureka_public.employee_contact TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.authenticate TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.current_employee TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.employee_full_name TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.employee_full_address TO ' || role || ';' ||
+                'GRANT SELECT ON TABLE eureka_public.client TO ' || role || ';' ||
+                'GRANT SELECT ON TABLE eureka_public.client_contact TO ' || role || ';' ||
+                'GRANT SELECT, UPDATE ON TABLE eureka_public.client_contract TO ' || role || ';' ||
+                'GRANT INSERT, SELECT, UPDATE ON TABLE eureka_public.client_contract_movement TO ' || role || ';' ||
+                'GRANT SELECT ON TABLE eureka_public.business_contact TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.client_full_name TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.client_full_address TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.custom_to_char_client_contract_movement_date(TIMESTAMPTZ) TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.client_contract_full_address TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.client_contract_formated_start_date TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.client_contract_formated_end_date TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.update_contracts_status TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.all_contracts_to_pay TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.charge_month TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.pay_and_renovate_client_contract TO ' || role || ';';
+
+            FOREACH privileges IN ARRAY $2 LOOP
+                IF privileges.module = 'Clients' THEN
+                    IF privileges.add_modify THEN
+                        EXECUTE
+                            'GRANT INSERT, UPDATE ON TABLE eureka_public.client TO ' || role || ';' ||
+                            'GRANT INSERT, UPDATE ON TABLE eureka_public.client_contact TO ' || role || ';' ||
+                            'GRANT INSERT ON TABLE eureka_public.client_contract TO ' || role || ';' ||
+                            'GRANT INSERT, UPDATE ON TABLE eureka_public.business_contact TO ' || role || ';';
+
+                    END IF;
+
+                    IF privileges.delete THEN
+                        EXECUTE
+                            'GRANT DELETE ON TABLE eureka_public.client TO ' || role || ';' ||
+                            'GRANT DELETE ON TABLE eureka_public.client_contact TO ' || role || ';' ||
+                            'GRANT DELETE ON TABLE eureka_public.client_contract TO ' || role || ';' ||
+                            'GRANT DELETE ON TABLE eureka_public.business_contact TO ' || role || ';';
+                    END IF;
+                ELSEIF privileges.module = 'Employees' THEN
+                    IF privileges.add_modify THEN
+                        EXECUTE
+                            'GRANT INSERT, UPDATE ON TABLE eureka_public.employee TO ' || role || ';' ||
+                            'GRANT INSERT, UPDATE ON TABLE eureka_public.employee_contact TO ' || role || ';';
+                    END IF;
+
+                    IF privileges.delete THEN
+                        EXECUTE
+                            'GRANT DELETE ON TABLE eureka_public.employee TO ' || role || ';' ||
+                            'GRANT DELETE ON TABLE eureka_public.employee_contact TO ' || role || ';';
+                    END IF;
+                END IF;
+            END LOOP;
+        END IF;
+
+        RETURN role;
+    END;
+$$ LANGUAGE PLPGSQL VOLATILE;

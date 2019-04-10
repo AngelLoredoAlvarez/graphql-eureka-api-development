@@ -1,0 +1,5 @@
+CREATE FUNCTION eureka_public.employee_full_name(
+    employee eureka_public.employee
+) RETURNS TEXT AS $$
+    SELECT employee.name || ' ' || employee.first_name || ' ' || employee.last_name;
+$$ LANGUAGE SQL STABLE;

@@ -1,0 +1,13 @@
+CREATE TABLE eureka_public.township(
+    id UUID PRIMARY KEY DEFAULT UUID_GENERATE_V1MC(),
+    type_township TEXT NOT NULL,
+    township TEXT NOT NULL,
+    postal_code TEXT NOT NULL UNIQUE,
+    id_town UUID NOT NULL REFERENCES eureka_public.town(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+Index
+CREATE INDEX township_id_town_idx ON eureka_public.township(id_town);
+
+Omit the query townshipByPostalCode
+COMMENT ON CONSTRAINT township_postal_code_key ON eureka_public.township IS E'@omit';

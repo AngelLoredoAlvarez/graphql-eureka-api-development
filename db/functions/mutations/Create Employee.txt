@@ -1,0 +1,94 @@
+CREATE OR REPLACE FUNCTION eureka_public.create_employee(
+    name TEXT,
+    first_name TEXT,
+    last_name TEXT,
+    id_town UUID,
+    id_township UUID,
+    id_street UUID,
+    exterior_number TEXT,
+    contacts eureka_public.contact[],
+    username TEXT,
+    password TEXT,
+    role TEXT
+) RETURNS eureka_public.employee AS $$
+    DECLARE
+        created_employee eureka_public.employee;
+        employee_contact eureka_public.contact;
+    BEGIN
+        IF EXISTS (
+            SELECT
+                1
+            FROM
+                eureka_public.employee
+            WHERE
+                UNACCENT(eureka_public.employee.name)
+            LIKE
+                UNACCENT($1)
+            AND
+                UNACCENT(eureka_public.employee.first_name)
+            LIKE
+                UNACCENT($2)
+            AND
+                UNACCENT(eureka_public.employee.last_name)
+            LIKE
+                UNACCENT($3)
+        ) THEN
+            RAISE EXCEPTION USING 
+                MESSAGE = 'El empleado ' || $1 || ' ' || $2 || ' ' || $3 || ' ya fue registrado.',
+                HINT = 'Empleado ya Registrado';
+        ELSE
+            IF EXISTS (
+                SELECT
+                    1
+                FROM
+                    eureka_private.user
+                WHERE
+                    UNACCENT(eureka_private.user.username)
+                ILIKE
+                    UNACCENT($9)
+            ) THEN
+                RAISE EXCEPTION USING 
+                    MESSAGE = 'El nombre de usuario ' || $9 || ' ya fue registrado por otro empleado.',
+                    HINT = 'Nombre de Usuario ya Registrado';
+            ELSE
+                INSERT INTO eureka_public.employee(
+                    name,
+                    first_name,
+                    last_name,
+                    id_town,
+                    id_township,
+                    id_street,
+                    exterior_number
+                ) VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING * INTO created_employee;
+
+                IF ARRAY_LENGTH($8, 1) > 0 THEN
+                    FOREACH employee_contact IN ARRAY $8 LOOP
+                        INSERT INTO eureka_public.employee_contact(
+                            type_contact,
+                            contact,
+                            id_employee
+                        ) VALUES(
+                            employee_contact.type_contact,
+                            employee_contact.contact,
+                            created_employee.id
+                        );
+                    END LOOP;
+                END IF;
+
+                INSERT INTO eureka_private.user(
+                    username,
+                    password,
+                    role,
+                    id_employee
+                ) VALUES(
+                    $9,
+                    CRYPT($10, GEN_SALT('BF', 8)),
+                    $11,
+                    created_employee.id
+                );
+            END IF;
+        END IF;
+
+        RETURN created_employee;
+    END;
+$$ LANGUAGE PLPGSQL VOLATILE;

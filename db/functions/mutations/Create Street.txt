@@ -1,0 +1,18 @@
+CREATE OR REPLACE FUNCTION eureka_public.create_street(
+    street TEXT,
+    id_township UUID
+) RETURNS eureka_public.street AS $$
+    DECLARE
+        created_street eureka_public.street;
+    BEGIN
+        IF EXISTS (SELECT 1 FROM eureka_public.street WHERE UNACCENT(eureka_public.street.street) LIKE UNACCENT($1) AND eureka_public.street.id_township = $2) THEN
+            RAISE EXCEPTION USING 
+                MESSAGE = 'La Calle ' || $1 || ' ya fue registrada.',
+                HINT = 'Calle ya Registrada';
+        ELSE
+            INSERT INTO eureka_public.street(street, id_township) VALUES($1, $2) RETURNING * INTO created_street;
+        END IF;
+
+        RETURN created_street;
+    END;
+$$ LANGUAGE PLPGSQL VOLATILE STRICT;

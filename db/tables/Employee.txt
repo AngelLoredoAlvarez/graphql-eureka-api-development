@@ -1,0 +1,19 @@
+CREATE TABLE eureka_public.employee(
+    id UUID PRIMARY KEY DEFAULT UUID_GENERATE_V1MC(),
+    name TEXT NOT NULL,
+    first_name TEXT NOT NULL,
+    last_name TEXT,
+    id_town UUID NOT NULL REFERENCES eureka_public.town(id),
+    id_township UUID NOT NULL REFERENCES eureka_public.township(id),
+    id_street UUID NOT NULL REFERENCES eureka_public.street(id),
+    exterior_number VARCHAR(5) NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+Index
+CREATE INDEX employee_id_town_idx ON eureka_public.employee(id_town);
+CREATE INDEX employee_id_township_idx ON eureka_public.employee(id_township);
+CREATE INDEX employee_id_street_idx ON eureka_public.employee(id_street);
+
+Omit the query employeeById
+COMMENT ON CONSTRAINT employee_pkey ON eureka_public.employee IS E'@omit';

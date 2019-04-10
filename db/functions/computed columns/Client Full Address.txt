@@ -1,0 +1,45 @@
+CREATE OR REPLACE FUNCTION eureka_public.client_full_address(
+    client_table eureka_public.client
+) RETURNS TEXT AS $$
+    DECLARE
+        town TEXT;
+        type_township TEXT;
+        township TEXT;
+        street TEXT;
+        exterior_number TEXT;
+        full_address TEXT;
+    BEGIN
+        SELECT
+            eureka_public.town.town,
+            eureka_public.township.type_township,
+            eureka_public.township.township,
+            eureka_public.street.street,
+            eureka_public.client.exterior_number
+        INTO
+            town,
+            type_township,
+            township,
+            street,
+            exterior_number
+        FROM
+            eureka_public.town
+        INNER JOIN
+            eureka_public.client
+        ON
+            eureka_public.town.id = eureka_public.client.id_town
+        INNER JOIN
+            eureka_public.township
+        ON
+            eureka_public.township.id = eureka_public.client.id_township
+        INNER JOIN
+            eureka_public.street
+        ON
+            eureka_public.street.id = eureka_public.client.id_street
+        WHERE
+            eureka_public.client.id = client_table.id;
+
+        full_address := street || ' #' || exterior_number || ', ' || type_township || ' ' || township || ', ' || town;
+
+        RETURN full_address;
+    END;
+$$ LANGUAGE PLPGSQL IMMUTABLE;

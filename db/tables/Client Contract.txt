@@ -1,0 +1,25 @@
+CREATE TABLE eureka_public.client_contract(
+    id UUID PRIMARY KEY DEFAULT UUID_GENERATE_V1MC(),
+    business TEXT NOT NULL UNIQUE,
+    id_town UUID NOT NULL REFERENCES eureka_public.town(id),
+    id_township UUID NOT NULL REFERENCES eureka_public.township(id),
+    id_street UUID NOT NULL REFERENCES eureka_public.street(id),
+    exterior_number VARCHAR(5) NOT NULL,
+    type_contract TEXT NOT NULL,
+    start_date TIMESTAMPTZ DEFAULT NOW(),
+    end_date TIMESTAMPTZ,
+    status TEXT NOT NULL,
+    id_client UUID NOT NULL REFERENCES eureka_public.client(id) ON UPDATE CASCADE ON DELETE CASCADE
+);
+
+Index
+CREATE INDEX client_contract_id_town_idx ON eureka_public.client_contract(id_town);
+CREATE INDEX client_contract_id_township_idx ON eureka_public.client_contract(id_township);
+CREATE INDEX client_contract_id_street_idx ON eureka_public.client_contract(id_street);
+CREATE INDEX client_contract_id_client_idx ON eureka_public.client_contract(id_client);
+
+Omit all query
+COMMENT ON TABLE eureka_public.client_contract IS E'@omit all';
+
+Omit clientContractByBusiness query
+COMMENT ON CONSTRAINT client_contract_business_key ON eureka_public.client_contract IS E'@omit';

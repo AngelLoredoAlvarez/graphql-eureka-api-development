@@ -1,0 +1,13 @@
+CREATE OR REPLACE FUNCTION eureka_public.all_roles() RETURNS SETOF TEXT AS $$
+    DECLARE
+        row RECORD;
+    BEGIN
+        FOR row IN 
+            SELECT usename FROM pg_user WHERE usename ILIKE ('%' || 'eureka_' || '%')
+        LOOP
+            RETURN NEXT row.usename;
+        END LOOP;
+
+        RETURN; 
+    END;
+$$ LANGUAGE PLPGSQL IMMUTABLE;

@@ -1,0 +1,25 @@
+CREATE OR REPLACE FUNCTION eureka_public.update_contracts_status() RETURNS VOID AS $$
+    DECLARE
+        contract eureka_public.client_contract;
+        contract_movement eureka_public.client_contract_movement;
+    BEGIN
+        FOR contract IN
+            SELECT * FROM eureka_public.client_contract WHERE TO_CHAR(end_date, 'DD-MM-YYYY') = TO_CHAR(NOW(), 'DD-MM-YYYY')
+        LOOP
+            IF NOT EXISTS(SELECT * FROM eureka_public.client_contract_movement WHERE date BETWEEN contract.start_date AND contract.end_date AND movement LIKE 'Adeudo') THEN
+                UPDATE eureka_public.client_contract SET status = 'Finalizado' WHERE id = contract.id;
+            END IF;
+        END LOOP;
+
+        FOR contract_movement IN
+            SELECT * FROM eureka_public.client_contract_movement WHERE TO_CHAR(date, 'MM-YYYY') = TO_CHAR(NOW(), 'MM-YYYY')
+        LOOP
+            IF TO_CHAR(contract_movement.date, 'DD-MM-YYYY') < TO_CHAR(NOW(), 'DD-MM-YYYY') AND contract_movement.movement = 'Por Pagar' THEN
+                UPDATE eureka_public.client_contract SET status = 'Adeudo' WHERE id = contract_movement.id_contract;
+                UPDATE eureka_public.client_contract_movement SET movement = 'Adeudo' WHERE movement LIKE 'Por Pagar' AND id_contract = contract_movement.id_contract;
+            END IF;
+        END LOOP;
+
+        RETURN;
+    END;
+$$ LANGUAGE PLPGSQL VOLATILE;
