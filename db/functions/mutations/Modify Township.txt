@@ -2,8 +2,8 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_township(
     type_township TEXT,
     township TEXT,
     postal_code TEXT,
-    id_town UUID,
-    id UUID
+    id_town INTEGER,
+    id INTEGER
 ) RETURNS eureka_public.township AS $$
     UPDATE
         eureka_public.township

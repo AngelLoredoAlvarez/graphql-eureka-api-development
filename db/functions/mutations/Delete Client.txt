@@ -1,8 +1,8 @@
 CREATE OR REPLACE FUNCTION eureka_public.delete_client(
-    id UUID
+    id INTEGER
 ) RETURNS eureka_public.client AS $$
     DECLARE
-        selected_id_contract UUID;
+        selected_id_contract INTEGER;
         client eureka_public.client;
     BEGIN
         SELECT

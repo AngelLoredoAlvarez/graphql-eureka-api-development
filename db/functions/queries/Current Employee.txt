@@ -12,7 +12,7 @@ CREATE OR REPLACE FUNCTION eureka_public.current_employee() RETURNS eureka_publi
         FROM
             eureka_public.employee
         WHERE
-            id = CURRENT_SETTING('jwt.claims.id_employee')::UUID
+            id = CURRENT_SETTING('jwt.claims.id_employee')::INTEGER
         INTO
             employee;
 
@@ -25,7 +25,7 @@ CREATE OR REPLACE FUNCTION eureka_public.current_employee() RETURNS eureka_publi
         FROM
             eureka_private.user
         WHERE
-            id_employee = CURRENT_SETTING('jwt.claims.id_employee')::UUID;
+            id_employee = CURRENT_SETTING('jwt.claims.id_employee')::INTEGER;
 
         employee_user = (username, role)::eureka_public.employee_user;
         

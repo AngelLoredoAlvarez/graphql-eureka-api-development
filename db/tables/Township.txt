@@ -1,9 +1,9 @@
 CREATE TABLE eureka_public.township(
-    id UUID PRIMARY KEY DEFAULT UUID_GENERATE_V1MC(),
+    id SERIAL PRIMARY KEY,
     type_township TEXT NOT NULL,
     township TEXT NOT NULL,
     postal_code TEXT NOT NULL UNIQUE,
-    id_town UUID NOT NULL REFERENCES eureka_public.town(id) ON UPDATE CASCADE ON DELETE CASCADE
+    id_town INTEGER NOT NULL REFERENCES eureka_public.town(id) ON DELETE CASCADE
 );
 
 Index

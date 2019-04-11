@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION eureka_public.all_client_contract_movements(
-    id_contract UUID
+    id_contract INTEGER
 ) RETURNS SETOF eureka_public.client_contract_movement AS $$
     SELECT 
         *

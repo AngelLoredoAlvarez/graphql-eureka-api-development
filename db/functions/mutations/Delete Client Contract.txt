@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION eureka_public.delete_client_contract(
-    id UUID
+    id INTEGER
 ) RETURNS eureka_public.client_contract AS $$
     DELETE FROM
         eureka_public.client_contract

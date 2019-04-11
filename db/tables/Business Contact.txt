@@ -1,7 +1,7 @@
 CREATE TABLE eureka_public.business_contact(
     type_contact TEXT NOT NULL,
     contact TEXT NOT NULL,
-    id_contract UUID NOT NULL REFERENCES eureka_public.client_contract(id) ON UPDATE CASCADE ON DELETE CASCADE
+    id_contract INTEGER NOT NULL REFERENCES eureka_public.client_contract(id) ON DELETE CASCADE
 );
 
 Index

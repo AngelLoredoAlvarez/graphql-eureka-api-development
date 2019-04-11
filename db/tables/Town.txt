@@ -1,5 +1,5 @@
 CREATE TABLE eureka_public.town(
-    id UUID PRIMARY KEY DEFAULT UUID_GENERATE_V1MC(),
+    id SERIAL PRIMARY KEY,
     town TEXT NOT NULL UNIQUE
 );
 

@@ -1,6 +1,13 @@
 CREATE OR REPLACE FUNCTION eureka_public.charge_month(
-    id_contract UUID
+    id_contract INTEGER
 ) RETURNS eureka_public.client_contract_movement AS $$
+    UPDATE
+        eureka_public.client_contract
+    SET
+        status = 'Activo'
+    WHERE
+        id = $1;
+
     UPDATE
         eureka_public.client_contract_movement
     SET

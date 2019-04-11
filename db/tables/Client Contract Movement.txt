@@ -1,7 +1,7 @@
 CREATE TABLE eureka_public.client_contract_movement(
     date TIMESTAMPTZ,
     movement TEXT,
-    id_contract UUID REFERENCES eureka_public.client_contract(id) ON UPDATE CASCADE ON DELETE CASCADE
+    id_contract INTEGER REFERENCES eureka_public.client_contract(id) ON DELETE CASCADE
 );
 
 Index on Table Foreign Key

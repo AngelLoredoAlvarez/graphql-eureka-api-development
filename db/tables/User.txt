@@ -2,7 +2,7 @@ CREATE TABLE eureka_private.user(
     username TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL,
     role TEXT NOT NULL,
-    id_employee UUID NOT NULL REFERENCES eureka_public.employee(id) ON UPDATE CASCADE ON DELETE CASCADE
+    id_employee INTEGER NOT NULL REFERENCES eureka_public.employee(id) ON DELETE CASCADE
 );
 
 Index

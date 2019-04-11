@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION eureka_public.employee_by_id(
-    id UUID
+    id INTEGER
 ) RETURNS eureka_public.selected_employee AS $$
     DECLARE
         employee eureka_public.employee;

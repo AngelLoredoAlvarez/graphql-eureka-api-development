@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION eureka_public.delete_employee(
-    id UUID
+    id INTEGER
 ) RETURNS eureka_public.employee AS $$
     DELETE FROM
         eureka_public.employee

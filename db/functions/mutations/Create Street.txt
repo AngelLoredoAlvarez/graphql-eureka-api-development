@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION eureka_public.create_street(
     street TEXT,
-    id_township UUID
+    id_township INTEGER
 ) RETURNS eureka_public.street AS $$
     DECLARE
         created_street eureka_public.street;

@@ -1,7 +1,7 @@
 CREATE TABLE eureka_public.employee_contact(
     type_contact TEXT NOT NULL,
     contact TEXT NOT NULL,
-    id_employee UUID NOT NULL REFERENCES eureka_public.employee(id) ON UPDATE CASCADE ON DELETE CASCADE
+    id_employee INTEGER NOT NULL REFERENCES eureka_public.employee(id) ON DELETE CASCADE
 );
 
 Index

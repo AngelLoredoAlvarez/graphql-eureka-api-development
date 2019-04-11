@@ -1,12 +1,12 @@
 CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
     business TEXT,
-    id_town UUID,
-    id_township UUID,
-    id_street UUID,
+    id_town INTEGER,
+    id_township INTEGER,
+    id_street INTEGER,
     exterior_number TEXT,
     type_contract TEXT,
     contacts eureka_public.contact[],
-    id_client UUID
+    id_client INTEGER
 ) RETURNS eureka_public.client_contract AS $$
     DECLARE
         created_client_contract eureka_public.client_contract;

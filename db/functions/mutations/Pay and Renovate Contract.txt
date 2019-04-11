@@ -1,5 +1,5 @@
 CREATE OR REPLACE FUNCTION eureka_public.pay_and_renovate_client_contract(
-    id_contract UUID,
+    id_contract INTEGER,
     type_contract TEXT
 ) RETURNS eureka_public.client_contract AS $$
     DECLARE

@@ -1,6 +1,6 @@
 CREATE OR REPLACE FUNCTION eureka_public.collect_contract_debt(
     date_of_debt TIMESTAMPTZ,
-    id_contract UUID
+    id_contract INTEGER
 ) RETURNS VOID AS $$
     DECLARE
         updated_contract_movement eureka_public.client_contract_movement;

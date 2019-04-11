@@ -14,7 +14,9 @@ CREATE OR REPLACE FUNCTION eureka_public.update_contracts_status() RETURNS VOID 
         FOR contract_movement IN
             SELECT * FROM eureka_public.client_contract_movement WHERE TO_CHAR(date, 'MM-YYYY') = TO_CHAR(NOW(), 'MM-YYYY')
         LOOP
-            IF TO_CHAR(contract_movement.date, 'DD-MM-YYYY') < TO_CHAR(NOW(), 'DD-MM-YYYY') AND contract_movement.movement = 'Por Pagar' THEN
+            IF TO_CHAR(contract_movement.date, 'DD-MM-YYYY') = TO_CHAR(NOW(), 'DD-MM-YYYY') AND contract_movement.movement LIKE 'Por Pagar' THEN
+                UPDATE eureka_public.client_contract SET status = 'Por Pagar' WHERE id = contract_movement.id_contract;
+            ELSEIF TO_CHAR(contract_movement.date, 'DD-MM-YYYY') < TO_CHAR(NOW(), 'DD-MM-YYYY') AND contract_movement.movement LIKE 'Por Pagar' THEN
                 UPDATE eureka_public.client_contract SET status = 'Adeudo' WHERE id = contract_movement.id_contract;
                 UPDATE eureka_public.client_contract_movement SET movement = 'Adeudo' WHERE movement LIKE 'Por Pagar' AND id_contract = contract_movement.id_contract;
             END IF;

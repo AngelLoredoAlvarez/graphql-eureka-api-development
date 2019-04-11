@@ -1,3 +1,2 @@
 CREATE EXTENSION "pgcrypto";
-CREATE EXTENSION "uuid-ossp";
 CREATE EXTENSION "unaccent";

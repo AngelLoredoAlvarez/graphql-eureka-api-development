@@ -1,7 +1,7 @@
 CREATE OR REPLACE FUNCTION eureka_public.modify_street(
     street TEXT,
-    id_township UUID,
-    id UUID
+    id_township INTEGER,
+    id INTEGER
 ) RETURNS eureka_public.street AS $$
     UPDATE
         eureka_public.street

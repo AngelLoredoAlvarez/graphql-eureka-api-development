@@ -2,7 +2,7 @@ CREATE OR REPLACE FUNCTION eureka_public.create_township(
     type_township TEXT,
     township TEXT,
     postal_code TEXT,
-    id_town UUID
+    id_town INTEGER
 ) RETURNS eureka_public.township AS $$
     DECLARE
         created_township eureka_public.township;
