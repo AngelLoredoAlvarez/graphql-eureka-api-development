@@ -18,7 +18,6 @@ const OPTIONS = {
   includeExtensionResources: false,
   showErrorStack: false,
   extendedErrors: ["detail", "hint", "errcode"],
-  skipPlugins: [require("graphile-build").NodePlugin],
   handleErrors: false,
   graphqlRoute: "/api/eureka",
   graphiqlRoute: "/graphiql",

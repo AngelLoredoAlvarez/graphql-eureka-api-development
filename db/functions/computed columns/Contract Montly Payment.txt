@@ -1,0 +1,20 @@
+CREATE OR REPLACE FUNCTION eureka_public.client_contract_type_total(
+    type_contract eureka_public.client_contract_type
+) RETURNS TEXT AS $$
+    DECLARE
+        sub_total NUMERIC;
+        iva NUMERIC;
+        monthly_payment NUMERIC;
+    BEGIN
+        IF type_contract.discount_percentage > 0 THEN
+            sub_total := ((type_contract.number_months * type_contract.month_price) * type_contract.discount_percentage);
+        ELSE
+            sub_total := (type_contract.number_months * type_contract.month_price);
+        END IF;
+
+        iva := sub_total * type_contract.tax_percentage;
+        monthly_payment := ROUND(sub_total + iva, 2);
+
+        RETURN monthly_payment;
+    END;
+$$ LANGUAGE PLPGSQL STABLE;

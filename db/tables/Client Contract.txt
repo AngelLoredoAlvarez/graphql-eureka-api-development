@@ -5,7 +5,7 @@ CREATE TABLE eureka_public.client_contract(
     id_township INTEGER NOT NULL REFERENCES eureka_public.township(id),
     id_street INTEGER NOT NULL REFERENCES eureka_public.street(id),
     exterior_number VARCHAR(5) NOT NULL,
-    type_contract TEXT NOT NULL,
+    id_type_contract INTEGER NOT NULL REFERENCES eureka_public.client_contract_type(id) ON DELETE CASCADE,
     start_date TIMESTAMPTZ DEFAULT NOW(),
     end_date TIMESTAMPTZ,
     status TEXT NOT NULL,
@@ -16,6 +16,7 @@ Index
 CREATE INDEX client_contract_id_town_idx ON eureka_public.client_contract(id_town);
 CREATE INDEX client_contract_id_township_idx ON eureka_public.client_contract(id_township);
 CREATE INDEX client_contract_id_street_idx ON eureka_public.client_contract(id_street);
+CREATE INDEX client_contract_id_type_contract_idx ON eureka_public.client_contract(id_type_contract);
 CREATE INDEX client_contract_id_client_idx ON eureka_public.client_contract(id_client);
 
 Omit all query

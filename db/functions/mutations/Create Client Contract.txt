@@ -4,14 +4,15 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
     id_township INTEGER,
     id_street INTEGER,
     exterior_number TEXT,
-    type_contract TEXT,
+    id_type_contract INTEGER,
     contacts eureka_public.contact[],
     id_client INTEGER
 ) RETURNS eureka_public.client_contract AS $$
     DECLARE
+        months_quantity INTEGER;
         created_client_contract eureka_public.client_contract;
-        translated_type_contract TEXT;
         business_contact eureka_public.contact;
+        counter INTEGER := 0;
     BEGIN
         IF EXISTS(
             SELECT
@@ -27,11 +28,7 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                 MESSAGE = 'El contrato para el Negocio ' || $1 || ' ya fue registrado.',
                 HINT = 'Contrato ya Registrado';
         ELSE
-            IF $6 = '1 MES' THEN
-                translated_type_contract = REPLACE($6, 'MES', 'MONTH');
-            ELSE
-                translated_type_contract = REPLACE($6, 'MESES', 'MONTHS');
-            END IF;
+            SELECT number_months FROM eureka_public.client_contract_type WHERE id = $6 INTO months_quantity;
 
             INSERT INTO eureka_public.client_contract(
                 business,
@@ -39,7 +36,7 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                 id_township,
                 id_street,
                 exterior_number,
-                type_contract,
+                id_type_contract,
                 end_date,
                 status,
                 id_client
@@ -50,7 +47,7 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                 $4,
                 $5,
                 $6,
-                NOW() + translated_type_contract::INTERVAL,
+                NOW() + (months_quantity || ' MONTHS')::INTERVAL,
                 'Activo',
                 $8
             ) RETURNING * INTO created_client_contract;
@@ -69,67 +66,29 @@ CREATE OR REPLACE FUNCTION eureka_public.create_client_contract(
                 END LOOP;
             END IF;
 
-            IF $6 = '1 MES' THEN
-                INSERT INTO eureka_public.client_contract_movement(
-                    date,
-                    movement,
-                    id_contract
-                ) VALUES(
-                    created_client_contract.start_date,
-                    'Pagado',
-                    created_client_contract.id
-                );
-            ELSEIF $6 = '2 MESES' THEN
-                INSERT INTO eureka_public.client_contract_movement(
-                    date,
-                    movement,
-                    id_contract
-                ) VALUES (
-                    created_client_contract.start_date,
-                    'Pagado',
-                    created_client_contract.id
-                );
-
-                INSERT INTO eureka_public.client_contract_movement(
-                    date,
-                    movement,
-                    id_contract
-                ) VALUES (
-                    created_client_contract.start_date + '1 MONTH 3 DAYS'::INTERVAL,
-                    'Por Pagar',
-                    created_client_contract.id
-                );
-            ELSEIF $6 = '3 MESES' THEN
-                INSERT INTO eureka_public.client_contract_movement(
-                    date,
-                    movement,
-                    id_contract
-                ) VALUES (
-                    created_client_contract.start_date,
-                    'Pagado',
-                    created_client_contract.id
-                );
-
-                INSERT INTO eureka_public.client_contract_movement(
-                    date,
-                    movement,
-                    id_contract
-                ) VALUES (
-                    created_client_contract.start_date + '1 MONTH 3 DAYS'::INTERVAL,
-                    'Por Pagar',
-                    created_client_contract.id
-                );
-
-                INSERT INTO eureka_public.client_contract_movement(
-                    date,
-                    movement,
-                    id_contract
-                ) VALUES (
-                    created_client_contract.start_date + '2 MONTHS 3 DAYS'::INTERVAL,
-                    'Por Pagar',
-                    created_client_contract.id
-                );
-            END IF;
+            FOR counter IN 1..months_quantity LOOP
+                IF counter = 1 THEN
+                    INSERT INTO eureka_public.client_contract_movement(
+                        date,
+                        movement,
+                        id_contract
+                    ) VALUES(
+                        created_client_contract.start_date,
+                        'Pagado',
+                        created_client_contract.id
+                    );
+                ELSE
+                    INSERT INTO eureka_public.client_contract_movement(
+                        date,
+                        movement,
+                        id_contract
+                    ) VALUES(
+                        created_client_contract.start_date + (counter - 1 || ' MONTHS')::INTERVAL,
+                        'Por Pagar',
+                        created_client_contract.id
+                    );
+                END IF;
+            END LOOP;
         END IF;
 
         RETURN created_client_contract;

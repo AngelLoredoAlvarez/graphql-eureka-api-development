@@ -1,0 +1,9 @@
+CREATE TABLE eureka_public.client_contract_type (
+    id SERIAL PRIMARY KEY,
+    type_name TEXT,
+    number_months INTEGER,
+    month_price NUMERIC,
+    tax_type TEXT,
+    tax_percentage NUMERIC,
+    discount_percentage NUMERIC
+);

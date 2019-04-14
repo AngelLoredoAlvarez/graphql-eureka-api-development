@@ -4,123 +4,83 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client_contract(
     id_township INTEGER,
     id_street INTEGER,
     exterior_number TEXT,
-    type_contract TEXT,
+    id_type_contract INTEGER,
     contacts eureka_public.contact[],
     id INTEGER
 ) RETURNS eureka_public.client_contract AS $$
     DECLARE
-        selected_contract eureka_public.client_contract;
-        translated_type_contract TEXT;
+        selected_client_contract eureka_public.client_contract;
+        months_quantity INTEGER;
         modified_client_contract eureka_public.client_contract;
-        contract_start_date TIMESTAMPTZ;
         business_contact eureka_public.contact;
     BEGIN
-        SELECT * FROM eureka_public.client_contract WHERE eureka_public.client_contract.id = $8 INTO selected_contract;
+        SELECT * FROM eureka_public.client_contract WHERE eureka_public.client_contract.id = $8 INTO selected_client_contract;
+        SELECT number_months FROM eureka_public.client_contract_type WHERE eureka_public.client_contract_type.id = $6 INTO months_quantity;
 
-        IF $6 = '1 MES' THEN
-            translated_type_contract = REPLACE($6, 'MES', 'MONTH');
+        IF $6 <> selected_client_contract.id_type_contract AND selected_client_contract.status = 'Por Pagar' THEN
+            RAISE EXCEPTION USING 
+                MESSAGE = 'El Tipo de Contrato no puede ser modificado, pues este contrato esta por realizar su pago correspondiente.',
+                HINT = 'Pago Pendiente';
+        ELSEIF $6 <> selected_client_contract.id_type_contract AND selected_client_contract.status = 'Adeudo' THEN
+            RAISE EXCEPTION USING 
+                MESSAGE = 'El Tipo de Contrato no puede ser modificado, pues este contrato tiene adeudos pendientes.',
+                HINT = 'Adeudos Pendiente';
         ELSE
-            translated_type_contract = REPLACE($6, 'MESES', 'MONTHS');
-        END IF;
+            UPDATE
+                eureka_public.client_contract
+            SET
+                business = $1,
+                id_town = $2,
+                id_township = $3,
+                id_street = $4,
+                exterior_number = $5,
+                id_type_contract = $6,
+                end_date = end_date + (months_quantity || ' MONTHS')::INTERVAL
+            WHERE
+                eureka_public.client_contract.id = $8
+            RETURNING * INTO modified_client_contract;
 
-        UPDATE
-            eureka_public.client_contract
-        SET
-            business = $1,
-            id_town = $2,
-            id_township = $3,
-            id_street = $4,
-            exterior_number = $5,
-            type_contract = $6,
-            start_date = selected_contract.start_date,
-            end_date = selected_contract.start_date + translated_type_contract::INTERVAL
-        WHERE
-            client_contract.id = $8
-        RETURNING
-            *
-        INTO
-            modified_client_contract;
+            DELETE FROM eureka_public.business_contact WHERE eureka_public.business_contact.id_contract = $8;
 
-        DELETE FROM eureka_public.business_contact WHERE eureka_public.business_contact.id_contract = $8;
-
-        IF ARRAY_LENGTH($7, 1) > 0 THEN
-            FOREACH business_contact IN ARRAY $7 LOOP
-                INSERT INTO eureka_public.business_contact(
-                    type_contact,
-                    contact,
-                    id_contract
-                ) VALUES(
-                    business_contact.type_contact,
-                    business_contact.contact,
-                    $8
-                );
-            END LOOP;
-        END IF;
-
-        IF selected_contract.status = 'Activo' THEN
-            DELETE FROM eureka_public.client_contract_movement WHERE date BETWEEN selected_contract.start_date AND selected_contract.end_date AND id_contract = selected_contract.id;
-
-            IF $6 = '1 MES' THEN
-                INSERT INTO eureka_public.client_contract_movement(
-                    date,
-                    movement,
-                    id_contract
-                ) VALUES(
-                    modified_client_contract.start_date,
-                    'Pagado',
-                    modified_client_contract.id
-                );
-            ELSEIF $6 = '2 MESES' THEN
-                INSERT INTO eureka_public.client_contract_movement(
-                    date,
-                    movement,
-                    id_contract
-                ) VALUES (
-                    modified_client_contract.start_date,
-                    'Pagado',
-                    modified_client_contract.id
-                );
-
-                INSERT INTO eureka_public.client_contract_movement(
-                    date,
-                    movement,
-                    id_contract
-                ) VALUES (
-                    modified_client_contract.start_date + '1 MONTH 3 DAYS'::INTERVAL,
-                    'Por Pagar',
-                    modified_client_contract.id
-                );
-            ELSEIF $6 = '3 MESES' THEN
-                INSERT INTO eureka_public.client_contract_movement(
-                    date,
-                    movement,
-                    id_contract
-                ) VALUES (
-                    modified_client_contract.start_date,
-                    'Pagado',
-                    modified_client_contract.id
-                );
-
-                INSERT INTO eureka_public.client_contract_movement(
-                    date,
-                    movement,
-                    id_contract
-                ) VALUES (
-                    modified_client_contract.start_date + '1 MONTH 3 DAYS'::INTERVAL,
-                    'Por Pagar',
-                    modified_client_contract.id
-                );
-
-                INSERT INTO eureka_public.client_contract_movement(
-                    date,
-                    movement,
-                    id_contract
-                ) VALUES (
-                    modified_client_contract.start_date + '2 MONTHS 3 DAYS'::INTERVAL,
-                    'Por Pagar',
-                    modified_client_contract.id
-                );
+            IF ARRAY_LENGTH($7, 1) > 0 THEN
+                FOREACH business_contact IN ARRAY $7 LOOP
+                    INSERT INTO eureka_public.business_contact(
+                        type_contact,
+                        contact,
+                        id_contract
+                    ) VALUES(
+                        business_contact.type_contact,
+                        business_contact.contact,
+                        modified_client_contract.id
+                    );
+                END LOOP;
             END IF;
+
+            DELETE FROM eureka_public.client_contract_movement WHERE eureka_public.client_contract_movement.date BETWEEN selected_client_contract.start_date AND selected_client_contract.end_date AND eureka_public.client_contract_movement.id_contract = $8;
+
+            FOR counter IN 1..months_quantity LOOP
+                IF counter = 1 THEN
+                    INSERT INTO eureka_public.client_contract_movement(
+                        date,
+                        movement,
+                        id_contract
+                    ) VALUES(
+                        modified_client_contract.start_date,
+                        'Pagado',
+                        modified_client_contract.id
+                    );
+                ELSE
+                    INSERT INTO eureka_public.client_contract_movement(
+                        date,
+                        movement,
+                        id_contract
+                    ) VALUES(
+                        modified_client_contract.start_date + (counter - 1 || ' MONTHS')::INTERVAL,
+                        'Por Pagar',
+                        modified_client_contract.id
+                    );
+                END IF;
+            END LOOP;
         END IF;
 
         RETURN modified_client_contract;
