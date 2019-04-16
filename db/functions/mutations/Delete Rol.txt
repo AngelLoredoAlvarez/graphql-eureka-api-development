@@ -12,6 +12,7 @@ CREATE OR REPLACE FUNCTION eureka_public.delete_role(
                 HINT = 'No se puede eliminar el Rol';
         ELSE
             EXECUTE
+                'REVOKE ' || $1 || ' FROM eureka_administrador;' ||
                 'REVOKE CONNECT ON DATABASE eureka FROM ' || $1 || ';' ||
                 'REVOKE USAGE ON SCHEMA eureka_private FROM ' || $1 || ';' ||
                 'REVOKE USAGE ON SCHEMA eureka_public FROM ' || $1 || ';' ||

@@ -20,13 +20,8 @@ CREATE OR REPLACE FUNCTION eureka_public.create_role(
                 'GRANT CONNECT ON DATABASE eureka TO ' || role || ';' ||
                 'GRANT USAGE ON SCHEMA eureka_public TO ' || role || ';' ||
                 'GRANT USAGE ON SCHEMA eureka_private TO ' || role || ';' ||
-                'GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE eureka_public.town TO ' || role || ';' ||
-                'GRANT EXECUTE ON FUNCTION eureka_public.create_town TO ' || role || ';' ||
-                'GRANT EXECUTE ON FUNCTION eureka_public.modify_town TO ' || role || ';' ||
-                'GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE eureka_public.township TO ' || role || ';' ||
-                'GRANT EXECUTE ON FUNCTION eureka_public.create_township TO ' || role || ';' ||
-                'GRANT EXECUTE ON FUNCTION eureka_public.modify_township TO ' || role || ';' || 
-                'GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE eureka_public.street TO ' || role || ';' ||
+                'GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA eureka_public TO ' || role || ';' ||
+                'GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA eureka_private TO ' || role || ';' ||
                 'GRANT SELECT ON TABLE eureka_private.user TO ' || role || ';' ||
                 'GRANT SELECT ON TABLE eureka_public.employee TO ' || role || ';' ||
                 'GRANT SELECT ON TABLE eureka_public.employee_contact TO ' || role || ';' ||
@@ -34,14 +29,25 @@ CREATE OR REPLACE FUNCTION eureka_public.create_role(
                 'GRANT EXECUTE ON FUNCTION eureka_public.current_employee TO ' || role || ';' ||
                 'GRANT EXECUTE ON FUNCTION eureka_public.employee_full_name TO ' || role || ';' ||
                 'GRANT EXECUTE ON FUNCTION eureka_public.employee_full_address TO ' || role || ';' ||
+                'GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE eureka_public.town TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.create_town TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.modify_town TO ' || role || ';' ||
+                'GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE eureka_public.township TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.create_township TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.modify_township TO ' || role || ';' || 
+                'GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE eureka_public.street TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.create_street TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.modify_street TO ' || role || ';' ||
                 'GRANT SELECT ON TABLE eureka_public.client TO ' || role || ';' ||
                 'GRANT SELECT ON TABLE eureka_public.client_contact TO ' || role || ';' ||
-                'GRANT SELECT, UPDATE ON TABLE eureka_public.client_contract TO ' || role || ';' ||
-                'GRANT INSERT, SELECT, UPDATE ON TABLE eureka_public.client_contract_movement TO ' || role || ';' ||
+                'GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE eureka_public.client_contract TO ' || role || ';' ||
+                'GRANT INSERT, SELECT, UPDATE, DELETE ON TABLE eureka_public.client_contract_movement TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.all_client_contracts TO ' || role || ';' ||
+                'GRANT SELECT ON TABLE eureka_public.client_contract_type TO ' || role || ';' ||
                 'GRANT SELECT ON TABLE eureka_public.business_contact TO ' || role || ';' ||
                 'GRANT EXECUTE ON FUNCTION eureka_public.client_full_name TO ' || role || ';' ||
                 'GRANT EXECUTE ON FUNCTION eureka_public.client_full_address TO ' || role || ';' ||
-                'GRANT EXECUTE ON FUNCTION eureka_public.custom_to_char_client_contract_movement_date(TIMESTAMPTZ) TO ' || role || ';' ||
+                'GRANT EXECUTE ON FUNCTION eureka_public.custom_to_char_client_contract_movement_date TO ' || role || ';' ||
                 'GRANT EXECUTE ON FUNCTION eureka_public.client_contract_full_address TO ' || role || ';' ||
                 'GRANT EXECUTE ON FUNCTION eureka_public.client_contract_formated_start_date TO ' || role || ';' ||
                 'GRANT EXECUTE ON FUNCTION eureka_public.client_contract_formated_end_date TO ' || role || ';' ||
@@ -49,7 +55,6 @@ CREATE OR REPLACE FUNCTION eureka_public.create_role(
                 'GRANT EXECUTE ON FUNCTION eureka_public.all_contracts_to_pay TO ' || role || ';' ||
                 'GRANT EXECUTE ON FUNCTION eureka_public.charge_month TO ' || role || ';' ||
                 'GRANT EXECUTE ON FUNCTION eureka_public.pay_and_renovate_client_contract TO ' || role || ';';
-
             FOREACH privileges IN ARRAY $2 LOOP
                 IF privileges.module = 'Clients' THEN
                     IF privileges.add_modify THEN
