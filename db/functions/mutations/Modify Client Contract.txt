@@ -35,7 +35,7 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client_contract(
                 id_street = $4,
                 exterior_number = $5,
                 id_type_contract = $6,
-                end_date = end_date + (months_quantity || ' MONTHS')::INTERVAL
+                end_date = start_date + (months_quantity || ' MONTHS')::INTERVAL
             WHERE
                 eureka_public.client_contract.id = $8
             RETURNING * INTO modified_client_contract;
@@ -75,7 +75,7 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_client_contract(
                         movement,
                         id_contract
                     ) VALUES(
-                        modified_client_contract.start_date + (counter - 1 || ' MONTHS')::INTERVAL,
+                        modified_client_contract.start_date + ('3 DAYS ' || counter - 1 || ' MONTHS')::INTERVAL,
                         'Por Pagar',
                         modified_client_contract.id
                     );
