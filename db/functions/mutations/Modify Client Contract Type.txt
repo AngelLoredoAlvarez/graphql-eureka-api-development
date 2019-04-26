@@ -1,0 +1,23 @@
+CREATE OR REPLACE FUNCTION eureka_public.modify_client_contract_type(
+    type_name TEXT,
+    number_months INTEGER,
+    month_price NUMERIC,
+    tax_type TEXT,
+    tax_percentage NUMERIC,
+    discount_percentage NUMERIC,
+    id INTEGER
+) RETURNS eureka_public.client_contract_type AS $$
+    UPDATE
+        eureka_public.client_contract_type
+    SET
+        type_name = $1,
+        number_months = $2,
+        month_price = $3, 
+        tax_type = $4,
+        tax_percentage = ROUND($5 / 100::NUMERIC, 2),
+        discount_percentage = ROUND($6 / 100::NUMERIC, 2)
+    WHERE
+        id = $7
+    RETURNING
+        *;
+$$ LANGUAGE SQL VOLATILE STRICT;

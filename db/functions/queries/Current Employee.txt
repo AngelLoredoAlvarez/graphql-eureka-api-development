@@ -1,8 +1,6 @@
 CREATE OR REPLACE FUNCTION eureka_public.current_employee() RETURNS eureka_public.current_employee AS $$
     DECLARE
         employee eureka_public.employee;
-        username TEXT;
-        role TEXT;
         employee_user eureka_public.employee_user;
         privileges_module eureka_public.privileges_module;
         privileges_employee eureka_public.privileges_module[];
@@ -17,17 +15,13 @@ CREATE OR REPLACE FUNCTION eureka_public.current_employee() RETURNS eureka_publi
             employee;
 
         SELECT
-            eureka_private.user.username,
-            eureka_private.user.role
-        INTO
-            username,
-            role
+            *
         FROM
-            eureka_private.user
+            eureka_public.employee_user
         WHERE
-            id_employee = CURRENT_SETTING('jwt.claims.id_employee')::INTEGER;
-
-        employee_user = (username, role)::eureka_public.employee_user;
+            id_employee = CURRENT_SETTING('jwt.claims.id_employee')::INTEGER
+        INTO
+            employee_user;
         
         FOR privileges_module IN
             SELECT

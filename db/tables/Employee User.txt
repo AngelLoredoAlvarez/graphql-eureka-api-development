@@ -1,0 +1,21 @@
+CREATE TABLE eureka_public.employee_user(
+    id SERIAL PRIMARY KEY,
+    username TEXT NOT NULL UNIQUE,
+    role TEXT NOT NULL,
+    id_employee INTEGER NOT NULL UNIQUE REFERENCES eureka_public.employee(id) ON DELETE CASCADE
+);
+
+Index
+CREATE INDEX employee_user_id_employee_idx ON eureka_public.employee_user(id_employee);
+
+Omit the allEmployeeUsers query
+COMMENT ON TABLE eureka_public.employee_user IS E'@omit all';
+
+Omit the query employeeUserById
+COMMENT ON CONSTRAINT employee_user_pkey ON eureka_public.employee_user IS E'@omit';
+
+Omit the query employeeUserByUsername
+COMMENT ON CONSTRAINT employee_user_username_key ON eureka_public.employee_user IS E'@omit';
+
+Omit the query employeeUserByIdEmployee
+COMMENT ON CONSTRAINT employee_user_id_employee_key ON eureka_public.employee_user IS E'@omit';

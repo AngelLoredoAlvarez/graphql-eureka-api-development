@@ -15,8 +15,6 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_employee(
     DECLARE
         modified_employee eureka_public.employee;
         employee_contact eureka_public.contact;
-        username TEXT;
-        role TEXT;
         employee_user eureka_public.employee_user;
         selected_employee eureka_public.selected_employee;
     BEGIN
@@ -51,29 +49,25 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_employee(
         END IF;
 
         UPDATE
-            eureka_private.user
+            eureka_public.employee_user
         SET
             username = $9,
             role = $10
         WHERE
-            eureka_private.user.id_employee = $11
+            eureka_public.employee_user.id_employee = $11
         RETURNING 
-            eureka_private.user.username,
-            eureka_private.user.role 
+            *
         INTO
-            username,
-            role;
+            employee_user;
 
         IF $12 <> 'REEMPLAZAME' THEN
             UPDATE 
-                eureka_private.user
+                eureka_private.employee_user_password
             SET
-                password = CRYPT($12, GEN_SALT('BF', 8))
+                password_hash = CRYPT($12, GEN_SALT('BF', 8))
             WHERE
-                eureka_private.user.id_employee = $11;
+                eureka_private.employee_user_password.id_employee_user = $11;
         END IF;
-
-        employee_user = (username, role)::eureka_public.employee_user;
 
         selected_employee = (modified_employee, employee_user)::eureka_public.selected_employee;
 

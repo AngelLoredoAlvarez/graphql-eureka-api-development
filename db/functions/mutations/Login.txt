@@ -3,21 +3,31 @@ CREATE OR REPLACE FUNCTION eureka_public.authenticate(
     password TEXT
 ) returns eureka_private.jwt_token AS $$
     DECLARE
-        loggingin_user eureka_private.user;
+        role TEXT;
+        id_employee INTEGER;
+        password_hash TEXT;
     BEGIN
         SELECT
-            *
-        FROM
-            eureka_private.user
-        WHERE
-            eureka_private.user.username
-        LIKE
-            $1
+            eureka_public.employee_user.role,
+            eureka_public.employee_user.id_employee,
+            eureka_private.employee_user_password.password_hash
         INTO
-            loggingin_user;
+            role,
+            id_employee,
+            password_hash
+        FROM
+            eureka_public.employee_user
+        INNER JOIN
+            eureka_private.employee_user_password
+        ON
+            eureka_public.employee_user.id = eureka_private.employee_user_password.id_employee_user
+        WHERE
+            eureka_public.employee_user.username
+        LIKE
+            $1;
 
-        IF loggingin_user.password = CRYPT($2, loggingin_user.password) THEN
-            RETURN (loggingin_user.role, loggingin_user.id_employee)::eureka_private.jwt_token;
+        IF password_hash = CRYPT($2, password_hash) THEN
+            RETURN (role, id_employee)::eureka_private.jwt_token;
         ELSE
             RETURN NULL;
         END IF;

@@ -22,7 +22,8 @@ CREATE OR REPLACE FUNCTION eureka_public.create_role(
                 'GRANT USAGE ON SCHEMA eureka_private TO ' || role || ';' ||
                 'GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA eureka_public TO ' || role || ';' ||
                 'GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA eureka_private TO ' || role || ';' ||
-                'GRANT SELECT ON TABLE eureka_private.user TO ' || role || ';' ||
+                'GRANT SELECT ON TABLE eureka_public.employee_user TO ' || role || ';' ||
+                'GRANT SELECT ON TABLE eureka_private.employee_user_password TO ' || role || ';' ||
                 'GRANT SELECT ON TABLE eureka_public.employee TO ' || role || ';' ||
                 'GRANT SELECT ON TABLE eureka_public.employee_contact TO ' || role || ';' ||
                 'GRANT EXECUTE ON FUNCTION eureka_public.authenticate TO ' || role || ';' ||

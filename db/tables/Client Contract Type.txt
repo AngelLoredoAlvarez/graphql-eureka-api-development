@@ -1,0 +1,18 @@
+CREATE TABLE eureka_public.client_contract_type (
+    id SERIAL PRIMARY KEY,
+    type_name TEXT NOT NULL UNIQUE,
+    number_months INTEGER NOT NULL,
+    month_price NUMERIC NOT NULL,
+    tax_type TEXT NOT NULL,
+    tax_percentage NUMERIC NOT NULL,
+    discount_percentage NUMERIC NOT NULL
+);
+
+Omit the query clientContractTypeByTypeName
+COMMENT ON CONSTRAINT client_contract_type_type_name_key ON eureka_public.client_contract_type IS E'@omit';
+
+Omit the column tax_percentage
+COMMENT ON COLUMN eureka_public.client_contract_type.tax_percentage IS E'@omit';
+
+Omit column discount_percentage
+COMMENT ON COLUMN eureka_public.client_contract_type.discount_percentage IS E'@omit';

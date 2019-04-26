@@ -7,7 +7,7 @@ CREATE TABLE eureka_public.client_contract(
     exterior_number VARCHAR(5) NOT NULL,
     id_type_contract INTEGER NOT NULL REFERENCES eureka_public.client_contract_type(id) ON DELETE CASCADE,
     start_date TIMESTAMPTZ DEFAULT NOW(),
-    end_date TIMESTAMPTZ,
+    end_date TIMESTAMPTZ NOT NULL,
     status TEXT NOT NULL,
     id_client INTEGER NOT NULL REFERENCES eureka_public.client(id) ON DELETE CASCADE
 );

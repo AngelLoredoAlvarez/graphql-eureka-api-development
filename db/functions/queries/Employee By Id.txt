@@ -3,8 +3,6 @@ CREATE OR REPLACE FUNCTION eureka_public.employee_by_id(
 ) RETURNS eureka_public.selected_employee AS $$
     DECLARE
         employee eureka_public.employee;
-        username TEXT;
-        role TEXT;
         employee_user eureka_public.employee_user;
         selected_employee eureka_public.selected_employee;
     BEGIN
@@ -18,17 +16,14 @@ CREATE OR REPLACE FUNCTION eureka_public.employee_by_id(
             employee;
 
         SELECT
-            eureka_private.user.username,
-            eureka_private.user.role
-        INTO
-            username,
-            role
+            *
         FROM
-            eureka_private.user
+            eureka_public.employee_user
         WHERE
-            eureka_private.user.id_employee = $1;
+            eureka_public.employee_user.id_employee = $1
+        INTO
+            employee_user;
 
-        employee_user = (username, role)::eureka_public.employee_user;
         selected_employee = (employee, employee_user)::eureka_public.selected_employee;
 
         RETURN selected_employee;

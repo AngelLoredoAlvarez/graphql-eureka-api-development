@@ -1,4 +1,0 @@
-CREATE TYPE eureka_public.employee_user AS (
-    username TEXT,
-    role TEXT
-);

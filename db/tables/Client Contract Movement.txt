@@ -1,6 +1,6 @@
 CREATE TABLE eureka_public.client_contract_movement(
-    date TIMESTAMPTZ,
-    movement TEXT,
+    date TIMESTAMPTZ NOT NULL,
+    movement TEXT NOT NULL,
     id_contract INTEGER REFERENCES eureka_public.client_contract(id) ON DELETE CASCADE
 );
 

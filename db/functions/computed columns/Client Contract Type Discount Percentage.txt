@@ -1,0 +1,5 @@
+CREATE OR REPLACE FUNCTION eureka_public.client_contract_type_discount_percentage(
+    contract_type eureka_public.client_contract_type
+) RETURNS NUMERIC AS $$
+    SELECT FLOOR(contract_type.discount_percentage * 100);
+$$ LANGUAGE SQL STABLE;
