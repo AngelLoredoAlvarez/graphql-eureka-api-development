@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION eureka_public.all_roles() RETURNS SETOF TEXT AS $$
         row RECORD;
     BEGIN
         FOR row IN 
-            SELECT usename FROM pg_user WHERE usename ILIKE ('%' || 'eureka_' || '%')
+            SELECT usename FROM pg_user WHERE usename ILIKE ('%' || 'eureka_' || '%') ORDER BY usename ASC
         LOOP
             RETURN NEXT row.usename;
         END LOOP;

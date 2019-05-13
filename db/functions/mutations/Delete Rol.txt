@@ -4,7 +4,7 @@ CREATE OR REPLACE FUNCTION eureka_public.delete_role(
     DECLARE
         formated_role_name TEXT;
     BEGIN
-        IF EXISTS(SELECT * FROM eureka_private.user WHERE role LIKE $1) THEN
+        IF EXISTS(SELECT * FROM eureka_public.employee_user WHERE role LIKE $1) THEN
             formated_role_name = INITCAP(REPLACE($1, 'eureka_', ''));
 
             RAISE EXCEPTION USING 
@@ -13,13 +13,21 @@ CREATE OR REPLACE FUNCTION eureka_public.delete_role(
         ELSE
             EXECUTE
                 'REVOKE ' || $1 || ' FROM eureka_administrador;' ||
-                'REVOKE CONNECT ON DATABASE eureka FROM ' || $1 || ';' ||
+                'REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA eureka_private FROM ' || $1 || ';' ||
+                'REVOKE ALL ON ALL SEQUENCES IN SCHEMA eureka_private FROM ' || $1 || ';' ||
+                'REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA eureka_public FROM ' || $1 || ';' ||
+                'REVOKE ALL ON ALL SEQUENCES IN SCHEMA eureka_public FROM ' || $1 || ';' ||
+                'REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA eureka_private FROM ' || $1 || ';' ||
+                'REVOKE ALL ON ALL FUNCTIONS IN SCHEMA eureka_private FROM ' || $1 || ';' ||
+                'REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA eureka_public FROM ' || $1 || ';' ||
+                'REVOKE ALL ON ALL FUNCTIONS IN SCHEMA eureka_public FROM ' || $1 || ';' ||
+                'REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA eureka_private FROM ' || $1 || ';' ||
+                'REVOKE ALL ON ALL TABLES IN SCHEMA eureka_private FROM ' || $1 || ';' ||
+                'REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA eureka_public  FROM ' || $1 || ';' ||
+                'REVOKE ALL ON ALL TABLES IN SCHEMA eureka_public FROM ' || $1 || ';' ||
                 'REVOKE USAGE ON SCHEMA eureka_private FROM ' || $1 || ';' ||
                 'REVOKE USAGE ON SCHEMA eureka_public FROM ' || $1 || ';' ||
-                'REVOKE ALL ON ALL FUNCTIONS IN SCHEMA eureka_private FROM ' || $1 || ';' ||
-                'REVOKE ALL ON ALL FUNCTIONS IN SCHEMA eureka_public FROM ' || $1 || ';' ||
-                'REVOKE ALL ON ALL TABLES IN SCHEMA eureka_private FROM ' || $1 || ';' ||
-                'REVOKE ALL ON ALL TABLES IN SCHEMA eureka_public FROM ' || $1 || ';' ||
+                'REVOKE CONNECT ON DATABASE eureka FROM ' || $1 || ';' ||
                 'DROP ROLE ' || $1 || ';';
         END IF;
 

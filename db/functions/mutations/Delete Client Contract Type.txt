@@ -1,0 +1,24 @@
+CREATE OR REPLACE FUNCTION eureka_public.delete_client_contract_type(
+    id INTEGER
+) RETURNS eureka_public.client_contract_type AS $$
+    DECLARE
+        deleted_client_contract_type eureka_public.client_contract_type;
+    BEGIN
+        IF (SELECT 1 FROM eureka_public.client_contract WHERE eureka_public.client_contract.id_type_contract = $1) THEN
+            RAISE EXCEPTION USING 
+                MESSAGE = 'Existe un contrato que tiene asignado este tipo de contrato, primero, debes de eliminar estos contratos.',
+                HINT = 'No se puede eliminar este tipo de contrato';
+        ELSE
+            DELETE FROM
+                eureka_public.client_contract_type
+            WHERE
+                eureka_public.client_contract_type.id = $1
+            RETURNING
+                *
+            INTO
+                deleted_client_contract_type;
+        END IF;
+
+        RETURN deleted_client_contract_type;
+    END;
+$$ LANGUAGE PLPGSQL VOLATILE STRICT;

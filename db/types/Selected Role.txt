@@ -1,0 +1,4 @@
+CREATE TYPE eureka_public.selected_role AS (
+    role_name TEXT,
+    privileges eureka_public.privileges_module[]
+);

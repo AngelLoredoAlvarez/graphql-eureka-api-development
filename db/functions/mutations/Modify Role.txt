@@ -1,63 +1,66 @@
 CREATE OR REPLACE FUNCTION eureka_public.modify_role(
     role_name TEXT,
+    prev_role_name TEXT,
     role_privileges eureka_public.role_privileges[]
-) RETURNS eureka_public.privileges_module[] AS $$
+) RETURNS eureka_public.selected_role AS $$
     DECLARE
-        role TEXT := 'eureka_';
         privileges eureka_public.role_privileges;
         privileges_module eureka_public.privileges_module;
         privileges_role eureka_public.privileges_module[];
+        selected_role eureka_public.selected_role;
     BEGIN
-        role := role || LOWER($1);
+        IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE pg_roles.rolname LIKE 'eureka_' || LOWER($1)) THEN
+            EXECUTE 'ALTER ROLE ' || 'eureka_' || LOWER($2) || ' RENAME TO ' || 'eureka_' || LOWER($1) || ';';
+        END IF;
 
-        FOREACH privileges IN ARRAY $2 LOOP
+        FOREACH privileges IN ARRAY $3 LOOP
             IF privileges.module = 'Clients' THEN
                 IF privileges.add_modify THEN
                     EXECUTE
-                        'GRANT INSERT, UPDATE ON TABLE eureka_public.client TO ' || role || ';' ||
-                        'GRANT INSERT, UPDATE ON TABLE eureka_public.client_contact TO ' || role || ';' ||
-                        'GRANT INSERT, UPDATE ON TABLE eureka_public.client_contract TO ' || role || ';' ||
-                        'GRANT INSERT, UPDATE ON TABLE eureka_public.business_contact TO ' || role || ';';
+                        'GRANT INSERT, UPDATE ON TABLE eureka_public.client TO ' || 'eureka_' || LOWER($1) || ';' ||
+                        'GRANT INSERT, UPDATE ON TABLE eureka_public.client_contact TO ' || 'eureka_' || LOWER($1) || ';' ||
+                        'GRANT INSERT, UPDATE ON TABLE eureka_public.client_contract TO ' || 'eureka_' || LOWER($1) || ';' ||
+                        'GRANT INSERT, UPDATE ON TABLE eureka_public.business_contact TO ' || 'eureka_' || LOWER($1) || ';';
                 ELSE
                     EXECUTE
-                        'REVOKE INSERT, UPDATE ON TABLE eureka_public.client FROM ' || role || ';' ||
-                        'REVOKE INSERT, UPDATE ON TABLE eureka_public.client_contact FROM ' || role || ';' ||
-                        'REVOKE INSERT, UPDATE ON TABLE eureka_public.client_contract FROM ' || role || ';' ||
-                        'REVOKE INSERT, UPDATE ON TABLE eureka_public.business_contact FROM ' || role || ';';
+                        'REVOKE INSERT, UPDATE ON TABLE eureka_public.client FROM ' || 'eureka_' || LOWER($1) || ';' ||
+                        'REVOKE INSERT, UPDATE ON TABLE eureka_public.client_contact FROM ' || 'eureka_' || LOWER($1) || ';' ||
+                        'REVOKE INSERT, UPDATE ON TABLE eureka_public.client_contract FROM ' || 'eureka_' || LOWER($1) || ';' ||
+                        'REVOKE INSERT, UPDATE ON TABLE eureka_public.business_contact FROM ' || 'eureka_' || LOWER($1) || ';';
                 END IF;
 
                 IF privileges.delete THEN
                     EXECUTE
-                        'GRANT DELETE ON TABLE eureka_public.client TO ' || role || ';' ||
-                        'GRANT DELETE ON TABLE eureka_public.client_contact TO ' || role || ';' ||
-                        'GRANT DELETE ON TABLE eureka_public.client_contract TO ' || role || ';' ||
-                        'GRANT DELETE ON TABLE eureka_public.business_contact TO ' || role || ';';
+                        'GRANT DELETE ON TABLE eureka_public.client TO ' || 'eureka_' || LOWER($1) || ';' ||
+                        'GRANT DELETE ON TABLE eureka_public.client_contact TO ' || 'eureka_' || LOWER($1) || ';' ||
+                        'GRANT DELETE ON TABLE eureka_public.client_contract TO ' || 'eureka_' || LOWER($1) || ';' ||
+                        'GRANT DELETE ON TABLE eureka_public.business_contact TO ' || 'eureka_' || LOWER($1) || ';';
                 ELSE
                     EXECUTE
-                        'REVOKE DELETE ON TABLE eureka_public.client FROM ' || role || ';' ||
-                        'REVOKE DELETE ON TABLE eureka_public.client_contact FROM ' || role || ';' ||
-                        'REVOKE DELETE ON TABLE eureka_public.client_contract FROM ' || role || ';' ||
-                        'REVOKE DELETE ON TABLE eureka_public.business_contact FROM ' || role || ';';
+                        'REVOKE DELETE ON TABLE eureka_public.client FROM ' || 'eureka_' || LOWER($1) || ';' ||
+                        'REVOKE DELETE ON TABLE eureka_public.client_contact FROM ' || 'eureka_' || LOWER($1) || ';' ||
+                        'REVOKE DELETE ON TABLE eureka_public.client_contract FROM ' || 'eureka_' || LOWER($1) || ';' ||
+                        'REVOKE DELETE ON TABLE eureka_public.business_contact FROM ' || 'eureka_' || LOWER($1) || ';';
                 END IF;
             ELSEIF privileges.module = 'Employees' THEN
                 IF privileges.add_modify THEN
                     EXECUTE
-                        'GRANT INSERT, UPDATE ON TABLE eureka_public.employee TO ' || role || ';' ||
-                        'GRANT INSERT, UPDATE ON TABLE eureka_public.employee_contact TO ' || role || ';';
+                        'GRANT INSERT, UPDATE ON TABLE eureka_public.employee TO ' || 'eureka_' || LOWER($1) || ';' ||
+                        'GRANT INSERT, UPDATE ON TABLE eureka_public.employee_contact TO ' || 'eureka_' || LOWER($1) || ';';
                 ELSE
                     EXECUTE
-                        'REVOKE INSERT, UPDATE ON TABLE eureka_public.employee FROM ' || role || ';' ||
-                        'REVOKE INSERT, UPDATE ON TABLE eureka_public.employee_contact FROM ' || role || ';';
+                        'REVOKE INSERT, UPDATE ON TABLE eureka_public.employee FROM ' || 'eureka_' || LOWER($1) || ';' ||
+                        'REVOKE INSERT, UPDATE ON TABLE eureka_public.employee_contact FROM ' || 'eureka_' || LOWER($1) || ';';
                 END IF;
 
                 IF privileges.delete THEN
                     EXECUTE
-                        'GRANT DELETE ON TABLE eureka_public.employee TO ' || role || ';' ||
-                        'GRANT DELETE ON TABLE eureka_public.employee_contact TO ' || role || ';';
+                        'GRANT DELETE ON TABLE eureka_public.employee TO ' || 'eureka_' || LOWER($1) || ';' ||
+                        'GRANT DELETE ON TABLE eureka_public.employee_contact TO ' || 'eureka_' || LOWER($1) || ';';
                 ELSE
                     EXECUTE
-                        'REVOKE DELETE ON TABLE eureka_public.employee FROM ' || role || ';' ||
-                        'REVOKE DELETE ON TABLE eureka_public.employee_contact FROM ' || role || ';';
+                        'REVOKE DELETE ON TABLE eureka_public.employee FROM ' || 'eureka_' || LOWER($1) || ';' ||
+                        'REVOKE DELETE ON TABLE eureka_public.employee_contact FROM ' || 'eureka_' || LOWER($1) || ';';
                 END IF;
             END IF;
         END LOOP;
@@ -71,13 +74,15 @@ CREATE OR REPLACE FUNCTION eureka_public.modify_role(
             WHERE
                 grantee
             ILIKE
-                ('%' || $1 || '%')
+                ('%' || 'eureka_' || LOWER($1) || '%')
             GROUP BY
                 table_name
         LOOP
             privileges_role := ARRAY_APPEND(privileges_role, privileges_module);
         END LOOP;
 
-        RETURN privileges_role;
+        selected_role := ($1, privileges_role);
+
+        RETURN selected_role;
     END;
 $$ LANGUAGE PLPGSQL VOLATILE STRICT;
