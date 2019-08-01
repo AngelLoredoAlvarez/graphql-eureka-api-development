@@ -10,7 +10,7 @@ CREATE OR REPLACE FUNCTION eureka_public.create_role(
                 MESSAGE = 'Ese rol ya fue registrado.',
                 HINT = 'Rol ya Registrado';
         ELSE
-            EXECUTE 'CREATE ROLE ' || 'eureka_' || LOWER($1) || ' WITH LOGIN ENCRYPTED PASSWORD ' || 'eureka_' || LOWER($1) || ';';
+            EXECUTE 'CREATE ROLE ' || 'eureka_' || LOWER($1) || ' WITH LOGIN ENCRYPTED PASSWORD ''' || 'eureka_' || LOWER($1) || ''';';
             
             EXECUTE
                 'GRANT ' || 'eureka_' || LOWER($1) || ' TO eureka_administrador;' ||
@@ -87,6 +87,6 @@ CREATE OR REPLACE FUNCTION eureka_public.create_role(
             END LOOP;
         END IF;
 
-        RETURN 'eureka_' || $1;
+        RETURN 'eureka_' || LOWER($1);
     END;
 $$ LANGUAGE PLPGSQL VOLATILE;
