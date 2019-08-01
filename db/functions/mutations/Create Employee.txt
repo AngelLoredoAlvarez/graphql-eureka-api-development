@@ -14,6 +14,7 @@ CREATE OR REPLACE FUNCTION eureka_public.create_employee(
     DECLARE
         created_employee eureka_public.employee;
         employee_contact eureka_public.contact;
+        created_employee_user eureka_public.employee_user;
     BEGIN
         IF EXISTS (
             SELECT
@@ -41,9 +42,9 @@ CREATE OR REPLACE FUNCTION eureka_public.create_employee(
                 SELECT
                     1
                 FROM
-                    eureka_private.user
+                    eureka_public.employee_user
                 WHERE
-                    UNACCENT(eureka_private.user.username)
+                    UNACCENT(eureka_public.employee_user.username)
                 ILIKE
                     UNACCENT($9)
             ) THEN
@@ -75,16 +76,22 @@ CREATE OR REPLACE FUNCTION eureka_public.create_employee(
                     END LOOP;
                 END IF;
 
-                INSERT INTO eureka_private.user(
+                INSERT INTO eureka_public.employee_user(
                     username,
-                    password,
                     role,
                     id_employee
                 ) VALUES(
                     $9,
-                    CRYPT($10, GEN_SALT('BF', 8)),
                     $11,
                     created_employee.id
+                ) RETURNING * INTO created_employee_user;
+
+                INSERT INTO eureka_private.employee_user_password(
+                    password_hash,
+                    id_employee_user
+                ) VALUES(
+                    CRYPT($10, GEN_SALT('BF', 8)),
+                    created_employee_user.id
                 );
             END IF;
         END IF;
